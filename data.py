@@ -88,7 +88,7 @@ class Data:
                 else:
                     feature_val_list.append(0.0)
             feature['continuous_val'] = tf.train.Feature(float_list=tf.train.FloatList(value=feature_val_list))
-            example = tf.train.Example(features=tf.train.Features(feature))
+            example = tf.train.Example(features=tf.train.Features(feature=feature))
             writer.write(example.SerializeToString())
 
         writer.close()
