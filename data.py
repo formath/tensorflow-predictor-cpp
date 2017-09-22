@@ -13,7 +13,7 @@ class Data:
     # load fieldid and its featureid dict
     # field : {featureid : sortid, featureid : sortid, 'miss' : sortid, 'num': feature_num}
     def LoadDict(self, dict_file):
-        self.field_feature_dict = pickle.load(open(self.dict_file, 'rb'))
+        self.field_feature_dict = pickle.load(open(dict_file, 'rb'))
         print('load field num: ' + str(len(self.field_feature_dict)))
         for fieldid in self.field_feature_dict:
             print('field: ' + str(fieldid) + ' feature num: ' + str(len(self.field_feature_dict[fieldid])))
