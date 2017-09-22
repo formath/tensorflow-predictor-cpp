@@ -8,7 +8,7 @@ import tensorflow as tf
 class Data:
     def __init__(self, dict_file, continuous_fields, sparse_fields, linear_fields):
         self.LoadDict(dict_file)
-        self.ParseFields(continuous_fields, linear_fields, delete_fields)
+        self.ParseFields(continuous_fields, sparse_fields, linear_fields)
 
     # load fieldid and its featureid dict
     # field : {featureid : sortid, featureid : sortid, 'miss' : sortid, 'num': feature_num}
