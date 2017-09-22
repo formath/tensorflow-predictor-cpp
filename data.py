@@ -133,3 +133,19 @@ class Data:
                 linear_val.append(instance['linear_val_in_field_'+str(fieldid)])
             continuous_val = instance['continuous_val']
             return instance['label'], sparse_id, sparse_val, linear_id, linear_val, continuous_val
+
+if __name__ == '__main__':
+    if len(sys.argv) != 7:
+        print('''
+            Usage: python data.py dict_file continuous_fields sparse_fields linear_fields input_file output_file
+            params: dict_file, field feature dict
+                    continuous_fields, example 0,1,3,4
+                    sparse_fields, example 495, 38, 24
+                    linear_fields, those fields are also sparse, example 37,28,23
+                    input_file, input libfm data
+                    output_file, tfrecord file to be generated
+            ''')
+        exit(1)
+    data = Data(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+    data.StringToRecord(sys.argv[5], sys.argv[6])
+    
