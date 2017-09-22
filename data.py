@@ -2,7 +2,6 @@
 
 import sys
 import os
-import numpy as np
 import cPickle as pickle
 import tensorflow as tf
 
@@ -148,4 +147,3 @@ if __name__ == '__main__':
         exit(1)
     data = Data(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
     data.StringToRecord(sys.argv[5], sys.argv[6])
-    

@@ -1,13 +1,8 @@
 #!/usr/bin/env python
 
-from __future__ import print_function
 import sys
 import os
-import time
-import cPickle as pickle
-import numpy as np
 import tensorflow as tf
-from sklearn.metrics import roc_auc_score
 
 class Model:
     def __init__(self, embedding_size, field_feature_dict, sparse_field, continuous_field, linear_field, model_dir, hidden_layer, algo='adam', drop_out=1.0, alpha=0.0, beta=0.0, learning_rate=0.01):
@@ -42,7 +37,7 @@ class Model:
         '''
         forward graph
         '''
-        
+
         self.embedding = []
         self.hiddenW = []
         self.hiddenB = []
