@@ -98,7 +98,6 @@ class Data:
 
     def ReadBatch(file_name, max_epoch, batch_size, thread_num, min_after_dequeue):
         with tf.name_scope('input'):
-            ## 放函数里是否有问题？每次调用函数都会重新生成一个迭代器
             filename_queue = tf.train.string_input_producer(
                 tf.train.match_filenames_once(file_name), num_epochs=max_epoch)
             serialized_example = Decode(filename_queue)
