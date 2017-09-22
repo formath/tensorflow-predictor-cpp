@@ -56,7 +56,8 @@ class Data:
                 feature_id_list = []
                 feature_val_list = []
                 if fieldid in field2feature:
-                    for featureid, value in field2feature[fieldid]:
+                    for featureid in field2feature[fieldid]:
+                        value = field2feature[fieldid][featureid]
                         feature_id_list.append(self.field_feature_dict[fieldid][featureid])
                         feature_val_list.append(value)
                 else:
@@ -68,7 +69,8 @@ class Data:
                 feature_id_list = []
                 feature_val_list = []
                 if fieldid in field2feature:
-                    for featureid, value in field2feature[fieldid]:
+                    for featureid in field2feature[fieldid]:
+                        value = field2feature[fieldid][featureid]
                         feature_id_list.append(self.field_feature_dict[fieldid][featureid])
                         feature_val_list.append(value)
                 else:
@@ -80,7 +82,8 @@ class Data:
             for fieldid in self.continuous_field:
                 if fieldid in field2feature:
                     assert len(field2feature[fieldid]) == 1
-                    for featureid, value in field2feature[fieldid]:
+                    for featureid in field2feature[fieldid]:
+                        value = field2feature[fieldid][featureid]
                         feature_val_list.append(value)
                 else:
                     feature_val_list.append(0.0)
