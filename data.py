@@ -1,0 +1,135 @@
+#!/usr/bin/env python
+
+import sys
+import os
+import numpy as np
+import cPickle as pickle
+import tensorflow as tf
+
+class Data:
+    def __init__(self, dict_file, continuous_fields, sparse_fields, linear_fields):
+        self.LoadDict(dict_file)
+        self.ParseFields(continuous_fields, linear_fields, delete_fields)
+
+    # load fieldid and its featureid dict
+    # field : {featureid : sortid, featureid : sortid, 'miss' : sortid, 'num': feature_num}
+    def LoadDict(self, dict_file):
+        self.field_feature_dict = pickle.load(open(self.dict_file, 'rb'))
+        print('load field num: ' + str(len(self.field_feature_dict)))
+        for fieldid in self.field_feature_dict:
+            print('field: ' + str(fieldid) + ' feature num: ' + str(len(self.field_feature_dict[fieldid])))
+
+    def Dict(self):
+        assert self.field_feature_dict is not None
+        return self.field_feature_dict
+
+    # three type of field: continuous, sparse and linear
+    # sparse and linear can have the same one fieldid
+    def ParseFields(self, continuous_fields, sparse_fields, linear_fields):
+        self.continuous_field = [int(x) for x in continuous_fields.split(',')]
+        self.sparse_field = [int(x) for x in sparse_fields.split(',')]
+        self.linear_field = [int(x) for x in linear_fields.split(',')]
+        print('continuous field: ' + continuous_fields)
+        print('sparse field: ' + sparse_fields)
+        print('linear field: ' + linear_fields)
+
+    # parse each line of libfm data into tfrecord
+    def StringToRecord(self, input_file, output_file):
+        print('Start to convert {} to {}'.format(input_file, output_file))
+        writer = tf.python_io.TFRecordWriter(output_file)
+
+        for line in open(file, 'r'):
+            tokens = line.split(' ')
+            label = float(tokens[0])
+            field2feature = {}
+            for fea in tokens[1:]:
+                fieldid, featureid, value = fea.split(':')
+                if int(fieldid) not in field2feature:
+                    feature2value = {}
+                    feature2value[int(featureid)] = float(value)
+                    field2feature[int(fieldid)] = feature2value
+                else:
+                    field2feature[int(fieldid)][int(featureid)] = float(value)
+
+            feature = {}
+            feature['label'] = tf.train.Feature(float_list=tf.train.FloatList(value=[label]))
+            for fieldid in self.sparse_field:
+                feature_id_list = []
+                feature_val_list = []
+                if fieldid in field2feature:
+                    for featureid, value in field2feature[fieldid]:
+                        feature_id_list.append(self.field_feature_dict[fieldid][featureid])
+                        feature_val_list.append(value)
+                else:
+                    feature_id_list.append(self.field_dict[fieldid]['miss'])
+                    feature_val_list.append(0.0)
+                feature['sparse_id_in_field_'+str(fieldid)] = tf.train.Feature(int64_list=tf.train.Int64List(value=feature_id_list))
+                feature['sparse_val_in_field_'+str(fieldid)] = tf.train.Feature(float32_list=tf.train.Float32List(value=feature_val_list))
+            for fieldid in self.linear_field:
+                feature_id_list = []
+                feature_val_list = []
+                if fieldid in field2feature:
+                    for featureid, value in field2feature[fieldid]:
+                        feature_id_list.append(self.field_feature_dict[fieldid][featureid])
+                        feature_val_list.append(value)
+                else:
+                    feature_id_list.append(self.field_dict[fieldid]['miss'])
+                    feature_val_list.append(0.0)
+                feature['linear_id_in_field_'+str(fieldid)] = tf.train.Feature(int64_list=tf.train.Int64List(value=feature_id_list))
+                feature['linear_val_in_field_'+str(fieldid)] = tf.train.Feature(float32_list=tf.train.Float32List(value=feature_val_list))
+            feature_val_list = []
+            for fieldid in self.continuous_field:
+                if fieldid in field2feature:
+                    assert len(field2feature[fieldid]) == 1
+                    for featureid, value in field2feature[fieldid]:
+                        feature_val_list.append(value)
+                else:
+                    feature_val_list.append(0.0)
+            feature['continuous_val'] = tf.train.Feature(float32_list=tf.train.Float32List(value=feature_val_list))
+            example = tf.train.Example(features=tf.train.Features(feature))
+            writer.write(example.SerializeToString())
+
+        writer.close()
+        print('Successfully convert {} to {}'.format(input_file, output_file))  
+
+    def Decode(filename_queue):
+        reader = tf.TFRecordReader()
+        _, serialized_example = reader.read(filename_queue)
+        return serialized_example
+
+    def ReadBatch(file_name, max_epoch, batch_size, thread_num, min_after_dequeue):
+        with tf.name_scope('input'):
+            ## 放函数里是否有问题？每次调用函数都会重新生成一个迭代器
+            filename_queue = tf.train.string_input_producer(
+                tf.train.match_filenames_once(file_name), num_epochs=max_epoch)
+            serialized_example = Decode(filename_queue)
+            capacity = thread_num * batch_size + min_after_dequeue
+            batch_serialized_example = tf.train.shuffle_batch(
+                                    [serialized_example],
+                                    batch_size=batch_size,
+                                    num_threads=thread_num,
+                                    capacity=capacity,
+                                    min_after_dequeue=min_after_dequeue)
+            features = {}
+            features['label'] = tf.FixedLenFeature([], tf.float32)
+            for fieldid in self.sparse_field:
+                features['sparse_id_in_field_'+str(fieldid)] = tf.VarLenFeature(tf.int64)
+                features['sparse_val_in_field_'+str(fieldid)] = tf.VarLenFeature(tf.float32)
+            for fieldid in self.linear_field:
+                features['linear_id_in_field_'+str(fieldid)] = tf.VarLenFeature(tf.int64)
+                features['linear_val_in_field_'+str(fieldid)] = tf.VarLenFeature(tf.float32)
+            features['continuous_val'] = tf.FixedLenFeature([], tf.float32)
+            instance = tf.parse_example(batch_serialized_example, features)
+
+            sparse_id = []
+            sparse_val = []
+            for fieldid in self.sparse_field:
+                sparse_id.append(instance['sparse_id_in_field_'+str(fieldid)])
+                sparse_val.append(instance['sparse_val_in_field_'+str(fieldid)])
+            linear_id = []
+            linear_val = []
+            for fieldid in self.linear_field:
+                linear_id.append(instance['linear_id_in_field_'+str(fieldid)])
+                linear_val.append(instance['linear_val_in_field_'+str(fieldid)])
+            continuous_val = instance['continuous_val']
+            return instance['label'], sparse_id, sparse_val, linear_id, linear_val, continuous_val
