@@ -37,7 +37,7 @@ class Data:
         print('Start to convert {} to {}'.format(input_file, output_file))
         writer = tf.python_io.TFRecordWriter(output_file)
 
-        for line in open(file, 'r'):
+        for line in open(input_file, 'r'):
             tokens = line.split(' ')
             label = float(tokens[0])
             field2feature = {}
