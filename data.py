@@ -64,7 +64,7 @@ class Data:
                     feature_id_list.append(self.field_dict[fieldid]['miss'])
                     feature_val_list.append(0.0)
                 feature['sparse_id_in_field_'+str(fieldid)] = tf.train.Feature(int64_list=tf.train.Int64List(value=feature_id_list))
-                feature['sparse_val_in_field_'+str(fieldid)] = tf.train.Feature(float32_list=tf.train.Float32List(value=feature_val_list))
+                feature['sparse_val_in_field_'+str(fieldid)] = tf.train.Feature(float_list=tf.train.FloatList(value=feature_val_list))
             for fieldid in self.linear_field:
                 feature_id_list = []
                 feature_val_list = []
@@ -77,7 +77,7 @@ class Data:
                     feature_id_list.append(self.field_dict[fieldid]['miss'])
                     feature_val_list.append(0.0)
                 feature['linear_id_in_field_'+str(fieldid)] = tf.train.Feature(int64_list=tf.train.Int64List(value=feature_id_list))
-                feature['linear_val_in_field_'+str(fieldid)] = tf.train.Feature(float32_list=tf.train.Float32List(value=feature_val_list))
+                feature['linear_val_in_field_'+str(fieldid)] = tf.train.Feature(float_list=tf.train.FloatList(value=feature_val_list))
             feature_val_list = []
             for fieldid in self.continuous_field:
                 if fieldid in field2feature:
@@ -87,7 +87,7 @@ class Data:
                         feature_val_list.append(value)
                 else:
                     feature_val_list.append(0.0)
-            feature['continuous_val'] = tf.train.Feature(float32_list=tf.train.Float32List(value=feature_val_list))
+            feature['continuous_val'] = tf.train.Feature(float_list=tf.train.FloatList(value=feature_val_list))
             example = tf.train.Example(features=tf.train.Features(feature))
             writer.write(example.SerializeToString())
 
