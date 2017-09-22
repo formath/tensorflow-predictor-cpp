@@ -31,16 +31,20 @@ if not os.path.exists(FLAGS.tensorboard_dir):
 # data iter
 # TODO
 data = Data(dict_file, continuous_fields, sparse_fields, linear_fields)
-train_data = data.ReadBatch("../data/libsvm_data/train.data.tfrecord",
-                            FLAGS.max_epoch,
-                            FLAGS.batch_size,
-                            FLAGS.thread_num,
-                            FLAGS.min_after_dequeue)
-valid_data = data.ReadBatch("../data/libsvm_data/valid.data.tfrecord",
-                            FLAGS.max_epoch,
-                            FLAGS.batch_size,
-                            FLAGS.thread_num,
-                            FLAGS.min_after_dequeue)
+train_label, train_sparse_id, train_sparse_val, \
+train_linear_id, train_linear_val, train_continuous_val \
+= data.ReadBatch("../data/libsvm_data/train.data.tfrecord",
+                 FLAGS.max_epoch,
+                 FLAGS.batch_size,
+                 FLAGS.thread_num,
+                 FLAGS.min_after_dequeue)
+valid_label, valid_sparse_id, valid_sparse_val, \
+valid_linear_id, valid_linear_val, valid_continuous_val \
+= data.ReadBatch("../data/libsvm_data/test.data.tfrecord",
+                 FLAGS.max_epoch,
+                 FLAGS.batch_size,
+                 FLAGS.thread_num,
+                 FLAGS.min_after_dequeue)
 
 # define model
 feature_num = 124
@@ -48,7 +52,7 @@ label_num = 2
 model = Model(embedding_size, data.Dict(), sparse_fields, continuous_fields, linear_fields, model_dir, hidden_layer)
 
 # define loss
-logits, all_parameter = model.forward(train_data)
+logits, all_parameter = model.forward(sparse_id, sparse_val, linear_id, linear_val, continuous_val)
 train_label = tf.to_int64(train_label)
 cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits, train_label)
 loss = tf.reduce_mean(cross_entropy, name='loss')
@@ -81,7 +85,7 @@ train_op = optimizer.minimize(cost, global_step=global_step)
 
 # eval acc
 tf.get_variable_scope().reuse_variables()
-valid_logits = model.forward(valid_id, valid_value)
+valid_logits = model.forward(sparse_id, sparse_val, linear_id, linear_val, continuous_val)
 valid_softmax = tf.nn.softmax(valid_logits)
 valid_label = tf.to_int64(valid_label)
 correct_prediction = tf.equal(tf.argmax(valid_softmax, 1), valid_label)

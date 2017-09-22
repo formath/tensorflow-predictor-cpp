@@ -38,12 +38,11 @@ class Model:
 
         return tf.concat(emb, 1, name='concat_embedding')
 
-    def forward(self, data):
+    def forward(self, sparse_id, sparse_val, linear_id, linear_val, continuous_val):
         '''
         forward graph
         '''
-        _, sparse_id, sparse_val, linear_id, linear_val, continuous_val = data.ReadBatch()
-        sparse_placeholder, continuous_placeholer, linear_placeholder = self.placeholder_inputs()
+        
         self.embedding = []
         self.hiddenW = []
         self.hiddenB = []
