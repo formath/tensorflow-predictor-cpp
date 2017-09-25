@@ -17,7 +17,7 @@ class Model:
     def concat(self, fields, sparse_id, sparse_val):
         emb = []
         for i, field_id in enumerate(fields):
-            input_size = self.field_feature_dict[field_id]['index'] + 1
+            input_size = self.field_feature_dict[field_id]['num'] + 1
             with tf.variable_scope("emb") as scope:
                 embedding_variable = tf.Variable(tf.truncated_normal([input_size, self.embedding_size], stddev=0.05), name='emb' + str(field_id))
             embedding = tf.nn.embedding_lookup_sparse(embedding_variable, sparse_id[i], sparse_val[i], "mod", combiner="sum")
