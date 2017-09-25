@@ -23,6 +23,8 @@ flags.DEFINE_string("optimizer", "adagrad", "optimization algorithm")
 flags.DEFINE_integer('steps_to_validate', 10, 'steps to validate and print')
 flags.DEFINE_bool("train_from_checkpoint", False, "reload model from checkpoint and go on training")
 flags.DEFINE_string('dict', './libfm.dict', 'field feature dict')
+flags.DEFINE_string('train_file', './libfm.tfrecord', 'train file')
+flags.DEFINE_string('valid_file', './libfm.tfrecord', 'valid file')
 flags.DEFINE_string('continuous_fields', '', 'continuous fields. example 0,1,2')
 flags.DEFINE_string('sparse_fields', '', 'sparse fields. example 0,1,2')
 flags.DEFINE_string('linear_fields', '', 'linear sparse fields. example 0,1,2')
@@ -40,14 +42,14 @@ if not os.path.exists(FLAGS.tensorboard_dir):
 data = Data(FLAGS.dict, FLAGS.continuous_fields, FLAGS.sparse_fields, FLAGS.linear_fields)
 train_label, train_sparse_id, train_sparse_val, \
 train_linear_id, train_linear_val, train_continuous_val \
-    = data.ReadBatch("../data/libsvm_data/train.data.tfrecord",
+    = data.ReadBatch(FLAGS.train_file,
                      FLAGS.max_epoch,
                      FLAGS.batch_size,
                      FLAGS.thread_num,
                      FLAGS.min_after_dequeue)
 valid_label, valid_sparse_id, valid_sparse_val, \
 valid_linear_id, valid_linear_val, valid_continuous_val \
-    = data.ReadBatch("../data/libsvm_data/test.data.tfrecord",
+    = data.ReadBatch(FLAGS.valid_file,
                      FLAGS.max_epoch,
                      FLAGS.batch_size,
                      FLAGS.thread_num,

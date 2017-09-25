@@ -94,12 +94,12 @@ class Data:
         writer.close()
         print('Successfully convert {} to {}'.format(input_file, output_file))  
 
-    def Decode(filename_queue):
+    def Decode(self, filename_queue):
         reader = tf.TFRecordReader()
         _, serialized_example = reader.read(filename_queue)
         return serialized_example
 
-    def ReadBatch(file_name, max_epoch, batch_size, thread_num, min_after_dequeue):
+    def ReadBatch(self, file_name, max_epoch, batch_size, thread_num, min_after_dequeue):
         with tf.name_scope('input'):
             filename_queue = tf.train.string_input_producer(
                 tf.train.match_filenames_once(file_name), num_epochs=max_epoch)
