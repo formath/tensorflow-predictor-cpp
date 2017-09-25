@@ -31,6 +31,7 @@ flags.DEFINE_string('linear_fields', '', 'linear sparse fields. example 0,1,2')
 flags.DEFINE_string('hidden_layer', '100,100,50', 'hidden size for eacy layer')
 flags.DEFINE_float('l1', '0.001', 'l1 regularizetion')
 flags.DEFINE_float('l2', '0.001', 'l2 regularizetion')
+flags.DEFINE_integer('embedding_size', 10, 'embedding size')
 
 if not os.path.exists(FLAGS.checkpoint_dir):
     os.makedirs(FLAGS.checkpoint_dir)
@@ -56,7 +57,7 @@ valid_linear_id, valid_linear_val, valid_continuous_val \
                      FLAGS.min_after_dequeue)
 
 # define model
-model = Model(embedding_size, data.Dict(), FLAGS.sparse_fields, FLAGS.continuous_fields, FLAGS.linear_fields, FLAGS.hidden_layer)
+model = Model(FLAGS.embedding_size, data.Dict(), FLAGS.sparse_fields, FLAGS.continuous_fields, FLAGS.linear_fields, FLAGS.hidden_layer)
 
 # define loss
 logits, all_parameter = model.forward(train_sparse_id, train_sparse_val, train_linear_id, train_linear_val, train_continuous_val)
