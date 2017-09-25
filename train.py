@@ -22,6 +22,13 @@ flags.DEFINE_string("model_type", "wide_and_deep", "model type, option: wide, de
 flags.DEFINE_string("optimizer", "adagrad", "optimization algorithm")
 flags.DEFINE_integer('steps_to_validate', 10, 'steps to validate and print')
 flags.DEFINE_bool("train_from_checkpoint", False, "reload model from checkpoint and go on training")
+flags.DEFINE_string('dict', './libfm.dict', 'field feature dict')
+flags.DEFINE_string('continuous_fields', '', 'continuous fields. example 0,1,2')
+flags.DEFINE_string('sparse_fields', '', 'sparse fields. example 0,1,2')
+flags.DEFINE_string('linear_fields', '', 'linear sparse fields. example 0,1,2')
+flags.DEFINE_string('hidden_layer', '100,100,50', 'hidden size for eacy layer')
+flags.DEFINE_float('l1', '0.001', 'l1 regularizetion')
+flags.DEFINE_float('l2', '0.001', 'l2 regularizetion')
 
 if not os.path.exists(FLAGS.checkpoint_dir):
     os.makedirs(FLAGS.checkpoint_dir)
@@ -30,34 +37,32 @@ if not os.path.exists(FLAGS.tensorboard_dir):
 
 # data iter
 # TODO
-data = Data(dict_file, continuous_fields, sparse_fields, linear_fields)
+data = Data(FLAGS.dict, FLAGS.continuous_fields, FLAGS.sparse_fields, FLAGS.linear_fields)
 train_label, train_sparse_id, train_sparse_val, \
 train_linear_id, train_linear_val, train_continuous_val \
-= data.ReadBatch("../data/libsvm_data/train.data.tfrecord",
-                 FLAGS.max_epoch,
-                 FLAGS.batch_size,
-                 FLAGS.thread_num,
-                 FLAGS.min_after_dequeue)
+    = data.ReadBatch("../data/libsvm_data/train.data.tfrecord",
+                     FLAGS.max_epoch,
+                     FLAGS.batch_size,
+                     FLAGS.thread_num,
+                     FLAGS.min_after_dequeue)
 valid_label, valid_sparse_id, valid_sparse_val, \
 valid_linear_id, valid_linear_val, valid_continuous_val \
-= data.ReadBatch("../data/libsvm_data/test.data.tfrecord",
-                 FLAGS.max_epoch,
-                 FLAGS.batch_size,
-                 FLAGS.thread_num,
-                 FLAGS.min_after_dequeue)
+    = data.ReadBatch("../data/libsvm_data/test.data.tfrecord",
+                     FLAGS.max_epoch,
+                     FLAGS.batch_size,
+                     FLAGS.thread_num,
+                     FLAGS.min_after_dequeue)
 
 # define model
-feature_num = 124
-label_num = 2
-model = Model(embedding_size, data.Dict(), sparse_fields, continuous_fields, linear_fields, model_dir, hidden_layer)
+model = Model(embedding_size, data.Dict(), FLAGS.sparse_fields, FLAGS.continuous_fields, FLAGS.linear_fields, FLAGS.hidden_layer)
 
 # define loss
-logits, all_parameter = model.forward(sparse_id, sparse_val, linear_id, linear_val, continuous_val)
+logits, all_parameter = model.forward(train_sparse_id, train_sparse_val, train_linear_id, train_linear_val, train_continuous_val)
 train_label = tf.to_int64(train_label)
 cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits, train_label)
 loss = tf.reduce_mean(cross_entropy, name='loss')
-l1_regularizer = tf.contrib.layers.l1_regularizer(scale=self.alpha, scope=None)
-l2_regularizer = tf.contrib.layers.l2_regularizer(scale=self.beta, scope=None)
+l1_regularizer = tf.contrib.layers.l1_regularizer(scale=self.l1, scope=None)
+l2_regularizer = tf.contrib.layers.l2_regularizer(scale=self.l2, scope=None)
 l1_penalty = tf.contrib.layers.apply_regularization(l1_regularizer, all_parameter)
 l2_penalty = tf.contrib.layers.apply_regularization(l2_regularizer, all_parameter)
 cost = tf.reduce_mean(loss+ l2_penalty + l1_penalty, name='cost')
@@ -85,7 +90,7 @@ train_op = optimizer.minimize(cost, global_step=global_step)
 
 # eval acc
 tf.get_variable_scope().reuse_variables()
-valid_logits = model.forward(sparse_id, sparse_val, linear_id, linear_val, continuous_val)
+valid_logits = model.forward(valid_sparse_id, valid_sparse_val, valid_linear_id, valid_linear_val, valid_continuous_val)
 valid_softmax = tf.nn.softmax(valid_logits)
 valid_label = tf.to_int64(valid_label)
 correct_prediction = tf.equal(tf.argmax(valid_softmax, 1), valid_label)

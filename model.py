@@ -5,18 +5,12 @@ import os
 import tensorflow as tf
 
 class Model:
-    def __init__(self, embedding_size, field_feature_dict, sparse_field, continuous_field, linear_field, model_dir, hidden_layer, algo='adam', drop_out=1.0, alpha=0.0, beta=0.0, learning_rate=0.01):
+    def __init__(self, embedding_size, field_feature_dict, sparse_field, continuous_field, linear_field, hidden_layer):
         self.embedding_size = embedding_size
         self.field_feature_dict = field_feature_dict
         self.sparse_field = sparse_field
         self.continuous_field = continuous_field
         self.linear_field = linear_field
-        self.model_dir = model_dir
-        self.alpha = alpha
-        self.beta = beta
-        self.drop_out = drop_out
-        self.learning_rate = learning_rate
-        self.algo = algo
         self.hidden_layer = hidden_layer.split(",")
 
     # sparse embedding and concat all field embedding
