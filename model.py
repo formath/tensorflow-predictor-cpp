@@ -44,10 +44,9 @@ class Model:
         self.hiddenW = []
         self.hiddenB = []
 
-        # FIXME
-        sparse_embedding = self.concat(self.sparse_field, sparse_id, sparse_val)
-        #net = tf.concat([sparse_embedding, continuous_val], 1, name='concat_sparse_continuous')
-        net = sparse_embedding
+        net = self.concat(self.sparse_field, sparse_id, sparse_val)
+        if len(self.continuous_field) > 0:
+            net = tf.concat([net, continuous_val], 1, name='concat_sparse_continuous')
 
         #hidden layers
         for i, hidden_size in enumerate(self.hidden_layer):
@@ -62,7 +61,7 @@ class Model:
             #tf.summary.histogram('hidden_w' + str(i), weight)
 
         # merge linear sparse
-        if linear_placeholder is not None:
+        if len(self.linear_field) > 0:
             linear_embedding = self.concat(self.linear_field, linear_id, linear_val)
             net = tf.concat([net, linear_embedding], 1, name='concat_linear')
 
