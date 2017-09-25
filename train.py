@@ -67,7 +67,7 @@ l1_regularizer = tf.contrib.layers.l1_regularizer(scale=FLAGS.l1, scope=None)
 l2_regularizer = tf.contrib.layers.l2_regularizer(scale=FLAGS.l2, scope=None)
 l1_penalty = tf.contrib.layers.apply_regularization(l1_regularizer, all_parameter)
 l2_penalty = tf.contrib.layers.apply_regularization(l2_regularizer, all_parameter)
-cost = tf.reduce_mean(loss+ l2_penalty + l1_penalty, name='cost')
+cost = tf.reduce_mean(loss + l2_penalty + l1_penalty, name='cost')
 
 # define optimizer
 print("Optimization algorithm: {}".format(FLAGS.optimizer))
@@ -98,6 +98,9 @@ valid_label = tf.to_int64(valid_label)
 correct_prediction = tf.equal(tf.argmax(valid_softmax, 1), valid_label)
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
+# eval auc
+auc = tf.metrics.auc(predictions=valid_logits, labels=valid_label)
+
 # checkpoint
 checkpoint_file = FLAGS.checkpoint_dir + "/checkpoint"
 saver = tf.train.Saver()
@@ -126,9 +129,9 @@ with tf.Session() as sess:
         while not coord.should_stop():
             _, loss_value, step = sess.run([train_op, loss, global_step])
             if step % FLAGS.steps_to_validate == 0:
-                accuracy_value = sess.run([accuracy])
-                print("Step: {}, loss: {}, accuracy: {}".format(
-                        step, loss_value, accuracy_value))
+                auc_value = sess.run([auc])
+                print("Step: {}, loss: {}, auc: {}".format(
+                        step, loss_value, auc_value))
                 #writer.add_summary(summary_value, step)
                 saver.save(sess, checkpoint_file, global_step=step)
     except tf.errors.OutOfRangeError:
