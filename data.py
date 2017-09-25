@@ -2,7 +2,7 @@
 
 import sys
 import os
-import cPickle as pickle
+import pickle
 import tensorflow as tf
 
 class Data:

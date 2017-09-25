@@ -2,7 +2,7 @@
 
 import sys
 import os
-import cPickle as pickle
+import pickle
 
 class Dict:
 	def __init__(self, continuous_fields, sparse_fields, linear_fields):

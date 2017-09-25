@@ -20,7 +20,7 @@ flags.DEFINE_string("checkpoint_dir", "./checkpoint/", "checkpoint dirctory")
 flags.DEFINE_string("tensorboard_dir", "./tensorboard/", "summary data saved for tensorboard")
 flags.DEFINE_string("model_type", "wide_and_deep", "model type, option: wide, deep, wide_and_deep")
 flags.DEFINE_string("optimizer", "adagrad", "optimization algorithm")
-flags.DEFINE_integer('steps_to_validate', 10, 'steps to validate and print')
+flags.DEFINE_integer('steps_to_validate', 1, 'steps to validate and print')
 flags.DEFINE_bool("train_from_checkpoint", False, "reload model from checkpoint and go on training")
 flags.DEFINE_string('dict', './libfm.dict', 'field feature dict')
 flags.DEFINE_string('train_file', './libfm.tfrecord', 'train file')
@@ -92,36 +92,25 @@ train_op = optimizer.minimize(cost, global_step=global_step)
 
 # eval acc
 tf.get_variable_scope().reuse_variables()
-valid_logits = model.forward(valid_sparse_id, valid_sparse_val, valid_linear_id, valid_linear_val, valid_continuous_val)
+valid_logits, _ = model.forward(valid_sparse_id, valid_sparse_val, valid_linear_id, valid_linear_val, valid_continuous_val)
 valid_softmax = tf.nn.softmax(valid_logits)
 valid_label = tf.to_int64(valid_label)
 correct_prediction = tf.equal(tf.argmax(valid_softmax, 1), valid_label)
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-
-# eval auc
-valid_label = tf.cast(valid_label, tf.int32)
-sparse_labels = tf.reshape(valid_label, [-1, 1])
-derived_size = tf.shape(valid_label)[0]
-indices = tf.reshape(tf.range(0, derived_size, 1), [-1, 1])
-concated = tf.concat(1, [indices, sparse_labels])
-outshape = tf.pack([derived_size, label_num])
-new_valid_label = tf.sparse_to_dense(concated, outshape, 1.0, 0.0)
-_, auc_op = tf.contrib.metrics.streaming_auc(valid_softmax, new_valid_label)
 
 # checkpoint
 checkpoint_file = FLAGS.checkpoint_dir + "/checkpoint"
 saver = tf.train.Saver()
 
 # summary
-tf.scalar_summary('loss', loss)
-tf.scalar_summary('accuracy', accuracy)
-tf.scalar_summary('auc', auc_op)
-summary_op = tf.merge_all_summaries()
+#tf.scalar_summary('loss', loss)
+#tf.scalar_summary('accuracy', accuracy)
+#summary_op = tf.merge_all_summaries()
 
 # train loop
 with tf.Session() as sess:
     init_op = tf.initialize_all_variables()
-    writer = tf.train.SummaryWriter(FLAGS.tensorboard_dir, sess.graph)
+    #writer = tf.train.SummaryWriter(FLAGS.tensorboard_dir, sess.graph)
     sess.run(init_op)
     sess.run(tf.initialize_local_variables())
 
@@ -137,10 +126,10 @@ with tf.Session() as sess:
         while not coord.should_stop():
             _, loss_value, step = sess.run([train_op, loss, global_step])
             if step % FLAGS.steps_to_validate == 0:
-                accuracy_value, auc_value, summary_value = sess.run([accuracy, auc_op, summary_op])
-                print("Step: {}, loss: {}, accuracy: {}, auc: {}".format(
-                        step, loss_value, accuracy_value, auc_value))
-                writer.add_summary(summary_value, step)
+                accuracy_value = sess.run([accuracy])
+                print("Step: {}, loss: {}, accuracy: {}".format(
+                        step, loss_value, accuracy_value))
+                #writer.add_summary(summary_value, step)
                 saver.save(sess, checkpoint_file, global_step=step)
     except tf.errors.OutOfRangeError:
         print("training done")
