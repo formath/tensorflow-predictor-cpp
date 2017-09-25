@@ -39,7 +39,6 @@ if not os.path.exists(FLAGS.tensorboard_dir):
     os.makedirs(FLAGS.tensorboard_dir)
 
 # data iter
-# TODO
 data = Data(FLAGS.dict, FLAGS.continuous_fields, FLAGS.sparse_fields, FLAGS.linear_fields)
 train_label, train_sparse_id, train_sparse_val, \
 train_linear_id, train_linear_val, train_continuous_val \

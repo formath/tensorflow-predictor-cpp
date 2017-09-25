@@ -44,8 +44,10 @@ class Model:
         self.hiddenW = []
         self.hiddenB = []
 
+        # FIXME
         sparse_embedding = self.concat(self.sparse_field, sparse_id, sparse_val)
-        net = tf.concat([sparse_embedding, continuous_val], 1, name='concat_sparse_continuous')
+        #net = tf.concat([sparse_embedding, continuous_val], 1, name='concat_sparse_continuous')
+        net = sparse_embedding
 
         #hidden layers
         for i, hidden_size in enumerate(self.hidden_layer):
