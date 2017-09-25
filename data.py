@@ -16,7 +16,7 @@ class Data:
         self.field_feature_dict = pickle.load(open(dict_file, 'rb'))
         print('load field num: ' + str(len(self.field_feature_dict)))
         for fieldid in self.field_feature_dict:
-            print('field: ' + str(fieldid) + ' feature num: ' + str(len(self.field_feature_dict[fieldid])))
+            print('field: ' + str(fieldid) + ' feature num: ' + str(self.field_feature_dict[fieldid]['num']))
 
     def Dict(self):
         assert self.field_feature_dict is not None
