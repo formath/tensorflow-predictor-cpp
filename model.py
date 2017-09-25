@@ -8,10 +8,18 @@ class Model:
     def __init__(self, embedding_size, field_feature_dict, sparse_field, continuous_field, linear_field, hidden_layer):
         self.embedding_size = embedding_size
         self.field_feature_dict = field_feature_dict
-        self.sparse_field = sparse_field
-        self.continuous_field = continuous_field
-        self.linear_field = linear_field
-        self.hidden_layer = hidden_layer.split(",")
+        self.sparse_field =[]
+        for i in sparse_field.split(','):
+            self.sparse_field.append(int(i))
+        self.continuous_field = []
+        for i in continuous_field.split(','):
+            self.continuous_field.append(int(i))
+        self.linear_field = []
+        for i in linear_field.split(','):
+            self.linear_field.append(int(i))
+        self.hidden_layer = []
+        for i in hidden_layer.split(','):
+            self.hidden_layer.append(int(i))
 
     # sparse embedding and concat all field embedding
     def concat(self, fields, sparse_id, sparse_val):
@@ -43,8 +51,8 @@ class Model:
         for i, hidden_size in enumerate(self.hidden_layer):
             dim = net.get_shape().as_list()[1]
             with tf.variable_scope("hidden") as scope:
-                weight = tf.Variable(tf.truncated_normal([dim, int(hidden_size)], stddev=0.05), name='fully_weight_'+str(i))
-                bias = tf.Variable(tf.truncated_normal([int(hidden_size)], stddev=0.05), name='fully_bias_'+str(i))
+                weight = tf.Variable(tf.truncated_normal([dim, hidden_size], stddev=0.05), name='fully_weight_'+str(i))
+                bias = tf.Variable(tf.truncated_normal([hidden_size], stddev=0.05), name='fully_bias_'+str(i))
             self.hiddenW.append(weight)
             self.hiddenB.append(bias)
             net = tf.nn.relu(tf.matmul(net, weight) + bias, name='fully_'+str(i))
