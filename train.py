@@ -4,8 +4,8 @@ import sys
 import os
 import datetime
 import tensorflow as tf
-import model
-import data
+from model import Model
+from data import Data
 
 # config
 flags = tf.app.flags
