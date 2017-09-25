@@ -25,9 +25,18 @@ class Data:
     # three type of field: continuous, sparse and linear
     # sparse and linear can have the same one fieldid
     def ParseFields(self, continuous_fields, sparse_fields, linear_fields):
-        self.continuous_field = [int(x) for x in continuous_fields.split(',')]
-        self.sparse_field = [int(x) for x in sparse_fields.split(',')]
-        self.linear_field = [int(x) for x in linear_fields.split(',')]
+        if continuous_fields != '':
+            self.continuous_field = [int(x) for x in continuous_fields.split(',')]
+        else:
+            self.continuous_field = []
+        if sparse_fields != '':
+            self.sparse_field = [int(x) for x in sparse_fields.split(',')]
+        else:
+            self.sparse_field = []
+        if linear_fields != '':
+            self.linear_field = [int(x) for x in linear_fields.split(',')]
+        else:
+            self.linear_field = []
         print('continuous field: ' + continuous_fields)
         print('sparse field: ' + sparse_fields)
         print('linear field: ' + linear_fields)
