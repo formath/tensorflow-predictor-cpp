@@ -9,14 +9,17 @@ class Model:
         self.embedding_size = embedding_size
         self.field_feature_dict = field_feature_dict
         self.sparse_field =[]
-        for i in sparse_field.split(','):
-            self.sparse_field.append(int(i))
+        if sparse_field != '':
+            for i in sparse_field.split(','):
+                self.sparse_field.append(int(i))
         self.continuous_field = []
-        for i in continuous_field.split(','):
-            self.continuous_field.append(int(i))
+        if continuous_field != '':
+            for i in continuous_field.split(','):
+                self.continuous_field.append(int(i))
         self.linear_field = []
-        for i in linear_field.split(','):
-            self.linear_field.append(int(i))
+        if linear_field != '':
+            for i in linear_field.split(','):
+                self.linear_field.append(int(i))
         self.hidden_layer = []
         for i in hidden_layer.split(','):
             self.hidden_layer.append(int(i))
