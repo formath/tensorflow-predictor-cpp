@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-python ../train.py \
+python ../python/train.py \
     --dict dict.data \
     --continuous_fields "" \
     --sparse_fields "9,6,116" \
