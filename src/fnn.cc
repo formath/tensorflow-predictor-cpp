@@ -12,13 +12,13 @@ using namespace tensorflow;
   // The data looks like the following:
   // Instance | SparseField | SparseFeatureId | SparseFeatureVal |
   // 0        |    1, 8     |     384, 734    |     1.0, 1.0     |
-  // 1        |    3        |     73          |     1.0			 |
-  // 2        |             |                 |					 |
-  // 3        |    2, 0     |     449, 31     |     1.0, 1.0	 |
-  // 4        |             |                 |					 |
-  // 5        |             |                 |					 | 
-  // 6        |             |                 |					 |
-  // 7        |    5        |     465         |     1.0			 |
+  // 1        |    3        |     73          |     1.0          |
+  // 2        |             |                 |                  |
+  // 3        |    2, 0     |     449, 31     |     1.0, 1.0     |
+  // 4        |             |                 |                  |
+  // 5        |             |                 |                  | 
+  // 6        |             |                 |                  |
+  // 7        |    5        |     465         |     1.0          |
   // SparseTensor for field id, each SparseTensor construtct of three Tensor
   auto dense_int_indices1 =
       test::AsTensor<int64>({0, 0, 0, 1, 1, 0, 3, 0, 3, 1, 7, 0}, {6, 2}); // 每个数据对应[i,j]，共有6个数字，所以6行，每行最大2个数字，所以2列
