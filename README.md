@@ -1,5 +1,5 @@
 # deep-ctr
-deep models for click through rate prediction
+Deep models for click through rate prediction
 
 # Build
 
