@@ -56,17 +56,28 @@ int main(int argc, char* argv[]) {
   // when using `bazel run` since the cwd isn't where you call
   // `bazel run` but from inside a temp folder.)
   GraphDef graph_def;
-  status = ReadBinaryProto(Env::Default(), "../demo/model/graph.pb", &graph_def);
+  std::string graph_path = argv[1];
+  status = ReadBinaryProto(Env::Default(), graph_path, &graph_def);
   if (!status.ok()) {
-    std::cout << status.ToString() << "\n";
-    return 1;
+    throw runtime_error("Error loading graph from " + graph_path + ": " + status.ToString());
   }
 
   // Add the graph to the session
   status = session->Create(graph_def);
   if (!status.ok()) {
-    std::cout << status.ToString() << "\n";
-    return 1;
+    throw runtime_error("Error set graph to session: " + status.ToString());
+  }
+
+  // Read parameters from the saved checkpoint
+  Tensor checkpointPathTensor(DT_STRING, TensorShape());
+  checkpointPathTensor.scalar<std::string>()() = "../demo/model";
+  status = session->Run(
+          {{ graph_def.saver_def().filename_tensor_name(), checkpointPathTensor },},
+          {},
+          {graph_def.saver_def().restore_op_name()},
+          nullptr);
+  if (!status.ok()) {
+    throw runtime_error("Error loading checkpoint from " + checkpointPath + ": " + status.ToString());
   }
 
   // Setup inputs and outputs:
