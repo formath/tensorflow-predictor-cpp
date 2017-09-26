@@ -70,14 +70,15 @@ int main(int argc, char* argv[]) {
 
   // Read parameters from the saved checkpoint
   Tensor checkpointPathTensor(DT_STRING, TensorShape());
-  checkpointPathTensor.scalar<std::string>()() = "../demo/model";
+  std::string checkpoint_path = argv[2];
+  checkpointPathTensor.scalar<std::string>()() = checkpoint_path;
   status = session->Run(
           {{ graph_def.saver_def().filename_tensor_name(), checkpointPathTensor },},
           {},
           {graph_def.saver_def().restore_op_name()},
           nullptr);
   if (!status.ok()) {
-    throw runtime_error("Error loading checkpoint from " + checkpointPath + ": " + status.ToString());
+    throw runtime_error("Error loading checkpoint from " + checkpoint_path + ": " + status.ToString());
   }
 
   // Setup inputs and outputs:
