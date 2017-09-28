@@ -11,7 +11,7 @@ int main(int argc, char* argv[]) {
     std::cout << status.ToString() << "\n";
     return 1;
   }
-
+/*
   // Read in the protobuf graph we exported
   // (The path seems to be relative to the cwd. Keep this in mind
   // when using `bazel run` since the cwd isn't where you call
@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
   // Print the results
   std::cout << outputs[0].DebugString() << "\n"; // Tensor<type: float shape: [] values: 30>
   std::cout << output_c() << "\n"; // 30
-
+*/
   // Free any resources used by the session
   session->Close();
   return 0;
