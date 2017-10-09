@@ -16,7 +16,7 @@ using namespace tensorflow;
   // 2        |             |                 |                  |
   // 3        |    2, 0     |     449, 31     |     1.0, 1.0     |
   // 4        |             |                 |                  |
-  // 5        |             |                 |                  | 
+  // 5        |             |                 |                  |
   // 6        |             |                 |                  |
   // 7        |    5        |     465         |     1.0          |
   // SparseTensor for field id, each SparseTensor construtct of three Tensor
@@ -41,7 +41,7 @@ using namespace tensorflow;
   sparse::SparseTensor sparse_tensor3(
       dense_int_indices3, dense_float_values3, dense_int_shape3);
 */
-  
+
 int main(int argc, char* argv[]) {
   // Initialize a tensorflow session
   Session* session;

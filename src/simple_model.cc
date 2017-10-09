@@ -8,26 +8,32 @@ int main(int argc, char* argv[]) {
   Session* session;
   Status status = NewSession(SessionOptions(), &session);
   if (!status.ok()) {
-    std::cout << status.ToString() << "\n";
+    std::cout << status.ToString() << std::endl;
     return 1;
+  } else {
+    std::cout << "Session created successfully" << std::endl;
   }
-/*
+
   // Read in the protobuf graph we exported
   // (The path seems to be relative to the cwd. Keep this in mind
   // when using `bazel run` since the cwd isn't where you call
   // `bazel run` but from inside a temp folder.)
   GraphDef graph_def;
-  status = ReadBinaryProto(Env::Default(), "../demo/model/graph.pb", &graph_def);
+  status = ReadBinaryProto(Env::Default(), "../demo/simple_model/graph.pb", &graph_def);
   if (!status.ok()) {
-    std::cout << status.ToString() << "\n";
+    std::cout << status.ToString() << std::endl;
     return 1;
+  } else {
+    std::cout << "Load graph protobuf successfully" << std::endl;
   }
 
   // Add the graph to the session
   status = session->Create(graph_def);
   if (!status.ok()) {
-    std::cout << status.ToString() << "\n";
+    std::cout << status.ToString() << std::endl;
     return 1;
+  } else {
+    std::cout << "Add graph to session successfully" << std::endl;
   }
 
   // Setup inputs and outputs:
@@ -51,8 +57,10 @@ int main(int argc, char* argv[]) {
   // Run the session, evaluating our "c" operation from the graph
   status = session->Run(inputs, {"c"}, {}, &outputs);
   if (!status.ok()) {
-    std::cout << status.ToString() << "\n";
+    std::cout << status.ToString() << std::endl;
     return 1;
+  } else {
+    std::cout << "Run session successfully" << std::endl;
   }
 
   // Grab the first output (we only evaluated one graph node: "c")
@@ -63,10 +71,11 @@ int main(int argc, char* argv[]) {
   // https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/public/tensor.h)
 
   // Print the results
-  std::cout << outputs[0].DebugString() << "\n"; // Tensor<type: float shape: [] values: 30>
-  std::cout << output_c() << "\n"; // 30
-*/
+  std::cout << outputs[0].DebugString() << std::endl; // Tensor<type: float shape: [] values: 30>
+  std::cout << "output value: " << output_c() << std::endl; // 30
+
   // Free any resources used by the session
   session->Close();
+
   return 0;
 }
