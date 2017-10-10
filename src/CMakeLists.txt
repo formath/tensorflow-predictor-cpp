@@ -2,17 +2,10 @@ cmake_minimum_required(VERSION 2.8)
 
 include_directories(
 	${PROJECT_SOURCE_DIR}/../tensorflow
-	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow
-	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/gen/host_obj
 	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/gen/proto
 	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/gen/protobuf-host/include
-	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads
 	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/eigen
-	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/gemmlowp
-	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/nsync
 	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/nsync/public
-	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/nsync/internal
-	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/fft2d
 	${PROJECT_SOURCE_DIR}/include)
 
 link_directories(
