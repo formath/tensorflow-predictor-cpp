@@ -79,4 +79,3 @@ class Model:
         all_parameter = [self.weight, self.bias] + self.hiddenW + self.hiddenB + self.embedding
 
         return logits, all_parameter
-        

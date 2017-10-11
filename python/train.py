@@ -61,7 +61,7 @@ model = Model(FLAGS.embedding_size, data.Dict(), FLAGS.sparse_fields, FLAGS.cont
 # define loss
 logits, all_parameter = model.forward(train_sparse_id, train_sparse_val, train_linear_id, train_linear_val, train_continuous_val)
 train_label = tf.to_int64(train_label)
-cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=train_label)
+cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=train_label, name='cross_entropy')
 loss = tf.reduce_mean(cross_entropy, name='loss')
 l1_regularizer = tf.contrib.layers.l1_regularizer(scale=FLAGS.l1, scope=None)
 l2_regularizer = tf.contrib.layers.l2_regularizer(scale=FLAGS.l2, scope=None)
@@ -138,7 +138,7 @@ with tf.Session() as sess:
         print("training done")
     finally:
         coord.request_stop()
-    
+
     saver.save(sess, checkpoint_file)
     tf.train.write_graph(sess.graph.as_graph_def(), FLAGS.model_dir, 'graph.pb', as_text=False)
 
