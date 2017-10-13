@@ -1,5 +1,8 @@
-# deep-ctr
-Deep models for click through rate prediction
+# tensorflow-predictor-cpp
+TensorFlow prediction using its C++ API.
+Contains two examples:
+* simple model `c=a+b`
+* an industrial deep model for large scale click through rate prediction
 
 # Build
 
@@ -12,16 +15,16 @@ sh tensorflow/contrib/makefile/build_all_ios.sh (depends on your platform)
 cd ..
 ```
 
-## Build deep-ctr
+## Build this repo
 ```bash
-git clone https://github.com/formath/deep-ctr.git
-cd deep-ctr
+git clone https://github.com/formath/tensorflow-predictor-cpp.git
+cd tensorflow-predictor-cpp
 mkdir build && cd build
 cmake ..
 make
 ```
 
-# Simple Demo
+# Simple Model
 This demo used `c=a+b` to show how to save the model and load it using C++ for prediction. [tensorflow_c++_api_prediction_basic](http://mathmach.com/2017/10/09/tensorflow_c++_api_prediction_basic/)
 ```bash
 cd demo/simple_model
@@ -31,7 +34,7 @@ sh train.sh
 sh predict.sh
 ```
 
-# Deep CTR Model Demo
+# Deep CTR Model
 This demo show a real-wrold deep model usage in click through rate prediction. [tensorflow_c++_api_prediction_advance](http://mathmach.com/2017/10/11/tensorflow_c++_api_prediction_advance/)
 
 ## Transform LibFM data into TFRecord
