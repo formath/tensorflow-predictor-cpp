@@ -18,7 +18,13 @@ set(DEEP_CTR_LINKER_LIBS "")
 list(APPEND DEEP_CTR_LINKER_LIBS libtensorflow-core-x86_64.a libprotobuf.a libnsync.a pthread m z)
 
 # executable
-set(TEST "simple_model.bin")
-add_executable(${TEST} "simple_model.cc")
+set(SIMPLE_MODEL "simple_model.bin")
+add_executable(${SIMPLE_MODEL} "simple_model.cc")
 set(EXECUTABLE_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/bin")
-target_link_libraries(${TEST} ${DEEP_CTR_LINKER_LIBS})
+target_link_libraries(${SIMPLE_MODEL} ${DEEP_CTR_LINKER_LIBS})
+
+# executable
+set(DEEP_MODEL "deep_model.bin")
+add_executable(${DEEP_MODEL} "deep_model.cc")
+set(EXECUTABLE_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/bin")
+target_link_libraries(${DEEP_MODEL} ${DEEP_CTR_LINKER_LIBS})
