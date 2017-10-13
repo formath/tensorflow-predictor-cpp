@@ -21,27 +21,35 @@ cmake ..
 make
 ```
 
-# Demo
-
-## Transform text file into TFRecord
+# Simple Demo
+This demo used `c=a+b` to show how to save the model and load it using C++ for prediction. [tensorflow_c++_api_prediction_basic](http://mathmach.com/2017/10/09/tensorflow_c++_api_prediction_basic/)
 ```bash
-cd demo
+cd demo/simple_model
+# train
+sh train.sh
+# predict
+sh predict.sh
+```
+
+# Deep CTR Model Demo
+This demo show a real-wrold deep model usage in click through rate prediction. [tensorflow_c++_api_prediction_advance](http://mathmach.com/2017/10/11/tensorflow_c++_api_prediction_advance/)
+
+## Transform LibFM data into TFRecord
+* LibFM format: `label fieldId:featureId:value ...`
+```bash
+cd demo/deep_model
 sh trans_data_to_tfrecord.sh
 cd ..
 ```
 
 ## Train model
 ```bash
-cd demo
 sh train.sh
-cd ..
 ```
 
 ## Predict using C++
 ```bash
-cd demo
-sh test.sh
-cd ..
+sh predict.sh
 ```
 
 # Reference

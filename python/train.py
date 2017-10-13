@@ -4,7 +4,7 @@ import sys
 import os
 import datetime
 import tensorflow as tf
-from model import Model
+from deep_model import Model
 from data import Data
 
 # config
@@ -16,9 +16,8 @@ flags.DEFINE_integer("batch_size", 100, "batch size for sgd")
 flags.DEFINE_integer("valid_batch_size", 100, "validate set batch size")
 flags.DEFINE_integer("thread_num", 1, "number of thread to read data")
 flags.DEFINE_integer("min_after_dequeue", 100, "min_after_dequeue for shuffle queue")
-flags.DEFINE_string("model_dir", "./model/", "model dirctory")
+flags.DEFINE_string("model_dir", "./saved_model/", "model dirctory")
 flags.DEFINE_string("tensorboard_dir", "./tensorboard/", "summary data saved for tensorboard")
-flags.DEFINE_string("model_type", "wide_and_deep", "model type, option: wide, deep, wide_and_deep")
 flags.DEFINE_string("optimizer", "adagrad", "optimization algorithm")
 flags.DEFINE_integer('steps_to_validate', 1, 'steps to validate and print')
 flags.DEFINE_bool("train_from_checkpoint", False, "reload model from checkpoint and go on training")

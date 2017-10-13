@@ -11,6 +11,6 @@
 #    --output_node_names=cross_entropy
 #cd -
 
-python ../python/freeze_graph.py \
-    --model_dir=./model \
+python ../../python/freeze_graph.py \
+    --model_dir=./saved_model \
     --output_node_names=Softmax

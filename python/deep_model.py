@@ -47,7 +47,10 @@ class Model:
         self.hiddenW = []
         self.hiddenB = []
 
+        # sparse field embedding
         net = self.concat(self.sparse_field, sparse_id, sparse_val)
+
+        # concat sparse field embedding and continuous field
         if len(self.continuous_field) > 0:
             net = tf.concat([net, continuous_val], 1, name='concat_sparse_continuous')
 
@@ -63,7 +66,7 @@ class Model:
             #net = tf.nn.dropout(net, self.drop_out, name='dropout_'+str(i))
             #tf.summary.histogram('hidden_w' + str(i), weight)
 
-        # merge linear sparse
+        # merge linear sparse field embedding
         if len(self.linear_field) > 0:
             linear_embedding = self.concat(self.linear_field, linear_id, linear_val)
             net = tf.concat([net, linear_embedding], 1, name='concat_linear')

@@ -19,7 +19,8 @@ int main(int argc, char* argv[]) {
   // when using `bazel run` since the cwd isn't where you call
   // `bazel run` but from inside a temp folder.)
   GraphDef graph_def;
-  status = ReadBinaryProto(Env::Default(), "../demo/simple_model/graph.pb", &graph_def);
+  std::string model_path = argv[1];
+  status = ReadBinaryProto(Env::Default(), model_path, &graph_def);
   if (!status.ok()) {
     std::cout << status.ToString() << std::endl;
     return 1;
