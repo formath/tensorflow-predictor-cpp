@@ -39,7 +39,6 @@ This demo show a real-wrold deep model usage in click through rate prediction. [
 ```bash
 cd demo/deep_model
 sh trans_data_to_tfrecord.sh
-cd ..
 ```
 
 ## Train model
