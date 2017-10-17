@@ -14,4 +14,4 @@ with tf.Session() as sess:
     print(b.eval()) # 6.0
     print(c.eval()) # 30.0
 
-    tf.train.write_graph(sess.graph_def, 'saved_model/', 'graph.pb', as_text=False)
+    tf.train.write_graph(sess.graph_def, 'model/', 'graph.pb', as_text=False)

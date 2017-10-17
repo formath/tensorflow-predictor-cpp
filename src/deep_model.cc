@@ -155,7 +155,9 @@ int main(int argc, char* argv[]) {
     }
   }
 
-  std::vector<std::pair<std::string, sparse::SparseTensor> > inputs;
+  // tensor inputs
+  std::vector<std::pair<std::string, Tensor> > inputs;
+
   for (int i = 0; i < sparse_field.size(); i++) {
     uint32 fieldid = sparse_field[i];
     std::vector<int32> indice;
@@ -174,21 +176,22 @@ int main(int argc, char* argv[]) {
       fid_list.push_back(0); // missid
       fval_list.push_back(0.0);
     }
+
+    // input/sparse_id/index/Placeholder
     auto id_indice_tensor =
       test::AsTensor<int32>(indice, {static_cast<int32>(indice.size()/2), 2});
-    auto id_list_tensor = test::AsTensor<int32>(fid_list);
-    auto id_tensor_shape = TensorShape({1, static_cast<int32>(fid_list.size())});
-    sparse::SparseTensor id_sparse_tensor(id_indice_tensor, id_list_tensor, id_tensor_shape);
-    auto val_indice_tensor =
-      test::AsTensor<int32>(indice, {static_cast<int32>(indice.size()/2), 2});
-    auto val_list_tensor = test::AsTensor<float>(fval_list);
-    auto val_tensor_shape = TensorShape({1, static_cast<int32>(fval_list.size())});
+    inputs.push_back(std::pair<std::string, Tensor>("input/sparse_" + std::to_string(fieldid) +"/index/Placeholder", id_indice_tensor));
 
-    // todo run embedding here
-    
-    sparse::SparseTensor val_sparse_tensor(val_indice_tensor, val_list_tensor, val_tensor_shape);
-    inputs.push_back(std::pair<std::string, sparse::SparseTensor>("sparse_id_in_field_"+std::to_string(fieldid), id_sparse_tensor));
-    inputs.push_back(std::pair<std::string, sparse::SparseTensor>("sparse_val_in_field_"+std::to_string(fieldid), val_sparse_tensor));
+    // input/sparse_id/id/Placeholder
+    auto id_list_tensor = test::AsTensor<int32>(fid_list);
+    inputs.push_back(std::pair<std::string, Tensor>("input/sparse_" + std::to_string(fieldid) +"/id/Placeholder", id_list_tensor));
+
+    // input/sparse_id/shape/Placeholder not used. Why?
+    auto id_tensor_shape = TensorShape({1, static_cast<int32>(fid_list.size())});
+
+    // input/sparse_id/value/Placeholder
+    auto val_list_tensor = test::AsTensor<float>(fval_list);
+    inputs.push_back(std::pair<std::string, Tensor>("input/sparse_" + std::to_string(fieldid) +"/value/Placeholder", val_list_tensor));
   }
   for (int i = 0; i < linear_field.size(); i++) {
     uint32 fieldid = linear_field[i];
@@ -208,25 +211,29 @@ int main(int argc, char* argv[]) {
       fid_list.push_back(0); // missid
       fval_list.push_back(0.0);
     }
+
+    // input/linear_id/index/Placeholder
     auto id_indice_tensor =
       test::AsTensor<int32>(indice, {static_cast<int32>(indice.size()/2), 2});
+    inputs.push_back(std::pair<std::string, Tensor>("input/linear_" + std::to_string(fieldid) +"/index/Placeholder", id_indice_tensor));
+
+    // input/linear_id/id/Placeholder
     auto id_list_tensor = test::AsTensor<int32>(fid_list);
+    inputs.push_back(std::pair<std::string, Tensor>("input/linear_" + std::to_string(fieldid) +"/id/Placeholder", id_list_tensor));
+
+    // input/linear_id/shape/Placeholder not used. Why?
     auto id_tensor_shape = TensorShape({1, static_cast<int32>(fid_list.size())});
-    sparse::SparseTensor id_sparse_tensor(id_indice_tensor, id_list_tensor, id_tensor_shape);
-    auto val_indice_tensor =
-      test::AsTensor<int32>(indice, {static_cast<int32>(indice.size()/2), 2});
+
+    // input/linear_id/value/Placeholder
     auto val_list_tensor = test::AsTensor<float>(fval_list);
-    auto val_tensor_shape = TensorShape({1, static_cast<int32>(fval_list.size())});
-    sparse::SparseTensor val_sparse_tensor(val_indice_tensor, val_list_tensor, val_tensor_shape);
-    inputs.push_back(std::pair<std::string, sparse::SparseTensor>("linear_id_in_field_"+std::to_string(fieldid), id_sparse_tensor));
-    inputs.push_back(std::pair<std::string, sparse::SparseTensor>("linear_val_in_field_"+std::to_string(fieldid), val_sparse_tensor));
+    inputs.push_back(std::pair<std::string, Tensor>("input/linear_" + std::to_string(fieldid) +"/value/Placeholder", val_list_tensor));
   }
 
   // The session will initialize the outputs
   std::vector<tensorflow::Tensor> outputs;
 
-  // Run the session, evaluating our "softmax" operation from the graph
-  //status = session->Run(inputs, {"Softmax"}, {}, &outputs);
+  // Run the session, evaluating our "logit" operation from the graph
+  status = session->Run(inputs, {"predict/add"}, {}, &outputs);
   if (!status.ok()) {
     std::cout << status.ToString() << std::endl;
     return 1;
@@ -234,7 +241,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Run session successfully" << std::endl;
   }
 
-  // Grab the first output (we only evaluated one graph node: "softmax")
+  // Grab the first output (we only evaluated one graph node: "logit")
   // and convert the node to a scalar representation.
   auto output_softmax = outputs[0].scalar<float>();
 

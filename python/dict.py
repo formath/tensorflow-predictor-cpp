@@ -2,7 +2,7 @@
 
 import sys
 import os
-import pickle
+from dict_pb2 import Dict as DictPB
 
 class Dict:
 	def __init__(self, continuous_fields, sparse_fields, linear_fields):
@@ -49,8 +49,19 @@ class Dict:
 		for fieldid in field_feature_dict:
 			print('field: ' + str(fieldid) + ' feature num: ' + str(field_feature_dict[fieldid]['num']))
 
+		dict = DictPB()
+		for fieldid, feature2sortid_dict in field_feature_dict.items():
+			for featureid, sortid in feature2sortid_dict.items():
+				if featureid == 'miss':
+					dict.field2missid[fieldid] = sortid
+					continue
+				if featureid == 'num':
+					dict.field2feanum[fieldid] = sortid
+					continue
+				dict.featureid2sortid[featureid] = sortid
 		output = open(output_file, 'wb')
-		pickle.dump(field_feature_dict, output, 2)
+		output.write(dict.SerializeToString())
+		output.close()
 		print('Successfully generate dict from {} to {}'.format(input_file, output_file))
 
 if __name__ == '__main__':

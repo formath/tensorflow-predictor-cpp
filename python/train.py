@@ -7,6 +7,9 @@ import tensorflow as tf
 from deep_model import Model
 from data import Data
 
+# Train model
+# It use tfrecord as input
+
 # config
 flags = tf.app.flags
 FLAGS = flags.FLAGS
@@ -16,7 +19,8 @@ flags.DEFINE_integer("batch_size", 100, "batch size for sgd")
 flags.DEFINE_integer("valid_batch_size", 100, "validate set batch size")
 flags.DEFINE_integer("thread_num", 1, "number of thread to read data")
 flags.DEFINE_integer("min_after_dequeue", 100, "min_after_dequeue for shuffle queue")
-flags.DEFINE_string("model_dir", "./saved_model/", "model dirctory")
+flags.DEFINE_string("model_dir", "./model/", "model dirctory")
+flags.DEFINE_string("checkpoint_dir", "./checkpoint", "checkpoint dirctory")
 flags.DEFINE_string("tensorboard_dir", "./tensorboard/", "summary data saved for tensorboard")
 flags.DEFINE_string("optimizer", "adagrad", "optimization algorithm")
 flags.DEFINE_integer('steps_to_validate', 1, 'steps to validate and print')
@@ -28,12 +32,14 @@ flags.DEFINE_string('continuous_fields', '', 'continuous fields. example 0,1,2')
 flags.DEFINE_string('sparse_fields', '', 'sparse fields. example 0,1,2')
 flags.DEFINE_string('linear_fields', '', 'linear sparse fields. example 0,1,2')
 flags.DEFINE_string('hidden_layer', '100,100,50', 'hidden size for eacy layer')
+flags.DEFINE_integer('embedding_size', 10, 'embedding size')
 flags.DEFINE_float('l1', '0.001', 'l1 regularizetion')
 flags.DEFINE_float('l2', '0.001', 'l2 regularizetion')
-flags.DEFINE_integer('embedding_size', 10, 'embedding size')
 
 if not os.path.exists(FLAGS.model_dir):
     os.makedirs(FLAGS.model_dir)
+if not os.path.exists(FLAGS.checkpoint_dir):
+    os.makedirs(FLAGS.checkpoint_dir)
 if not os.path.exists(FLAGS.tensorboard_dir):
     os.makedirs(FLAGS.tensorboard_dir)
 
@@ -100,8 +106,8 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 # eval auc
 auc = tf.metrics.auc(predictions=valid_logits, labels=valid_label)
 
-# checkpoint
-checkpoint_file = FLAGS.model_dir + "/model.checkpoint"
+# saver
+checkpoint_file = FLAGS.checkpoint_dir + "/model.checkpoint"
 saver = tf.train.Saver()
 
 # summary
@@ -132,7 +138,6 @@ with tf.Session() as sess:
                 print("Step: {}, loss: {}, auc: {}".format(
                         step, loss_value, auc_value))
                 #writer.add_summary(summary_value, step)
-                #saver.save(sess, checkpoint_file, global_step=step)
     except tf.errors.OutOfRangeError:
         print("training done")
     finally:
@@ -140,6 +145,7 @@ with tf.Session() as sess:
 
     saver.save(sess, checkpoint_file)
     tf.train.write_graph(sess.graph.as_graph_def(), FLAGS.model_dir, 'graph.pb', as_text=False)
+    tf.train.write_graph(sess.graph.as_graph_def(), FLAGS.model_dir, 'graph.txt', as_text=True)
 
     # wait for threads to exit
     coord.join(threads)

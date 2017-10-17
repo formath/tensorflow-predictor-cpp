@@ -1,3 +1,7 @@
 #!/usr/bin/env bash
 
-# TODO
+../../bin/deep_model.bin \
+	"9,6,116" \
+    "152,179" \
+    "" \
+	"./model/freeze_graph.pb"
