@@ -31,7 +31,7 @@ class Model:
             input_size = self.field_feature_dict.field2feanum[field_id] + 1
             with tf.variable_scope("emb_"+str(field_id)):
                 embedding_variable = tf.Variable(tf.truncated_normal([input_size, self.embedding_size], stddev=0.05), name='emb' + str(field_id))
-                embedding = tf.nn.embedding_lookup_sparse(embedding_variable, tf.cast(sparse_ids[i], tf.int32), sparse_vals[i], "mod", combiner="sum")
+                embedding = tf.nn.embedding_lookup_sparse(embedding_variable, sparse_ids[i], sparse_vals[i], "mod", combiner="sum")
                 emb.append(embedding)
             self.embedding.append(embedding_variable)
 
