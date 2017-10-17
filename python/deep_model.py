@@ -25,15 +25,14 @@ class Model:
             self.hidden_layer.append(int(i))
 
     # sparse embedding and concat all field embedding
-    def concat(self, fields, sparse_id, sparse_val):
+    def concat(self, fields, sparse_ids, sparse_vals):
         emb = []
         for i, field_id in enumerate(fields):
             input_size = self.field_feature_dict.field2feanum[field_id] + 1
             with tf.variable_scope("emb_"+str(field_id)):
                 embedding_variable = tf.Variable(tf.truncated_normal([input_size, self.embedding_size], stddev=0.05), name='emb' + str(field_id))
-                embedding = tf.nn.embedding_lookup_sparse(embedding_variable, sparse_id[i], sparse_val[i], "mod", combiner="sum")
+                embedding = tf.nn.embedding_lookup_sparse(embedding_variable, tf.cast(sparse_ids[i], tf.int32), sparse_vals[i], "mod", combiner="sum")
                 emb.append(embedding)
-            #tf.summary.histogram('emb_' + str(field_id), embedding_variable)
             self.embedding.append(embedding_variable)
 
         return tf.concat(emb, 1, name='concat_embedding')

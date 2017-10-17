@@ -126,14 +126,14 @@ int main(int argc, char* argv[]) {
   // Setup inputs and outputs
   // input 9:283:1 6:384:1 152:384:1
   std::string libfm_data = "9:283:1 6:384:1 152:384:1";
-  std::unordered_map<int32, std::unordered_map<int32, float> > instance;
+  std::unordered_map<int64, std::unordered_map<int64, float> > instance;
   std::vector<std::string> features;
   util::split(libfm_data, ' ', features);
   for (std::string feature: features) {
     std::vector<std::string> tokens;
     util::split(feature, ':', tokens);
-    int32 fieldid;
-    int32 featureid;
+    int64 fieldid;
+    int64 featureid;
     float value;
     int i = 0;
     for (std::string token: tokens) {
@@ -147,7 +147,7 @@ int main(int argc, char* argv[]) {
       i++;
     }
     if (instance.find(fieldid) == instance.end()) {
-      std::unordered_map<int32, float> f;
+      std::unordered_map<int64, float> f;
       f[featureid] = value;
       instance[fieldid] = f;
     } else {
@@ -159,13 +159,13 @@ int main(int argc, char* argv[]) {
   std::vector<std::pair<std::string, Tensor> > inputs;
 
   for (int i = 0; i < sparse_field.size(); i++) {
-    uint32 fieldid = sparse_field[i];
-    std::vector<int32> indice;
-    std::vector<int32> fid_list;
+    uint64 fieldid = sparse_field[i];
+    std::vector<int64> indice;
+    std::vector<int64> fid_list;
     std::vector<float> fval_list;
     if (instance.find(fieldid) != instance.end()) {
       int num = 0;
-      for (std::unordered_map<int32, float>::const_iterator iter = instance[fieldid].begin();
+      for (std::unordered_map<int64, float>::const_iterator iter = instance[fieldid].begin();
           iter != instance[fieldid].end(); iter++) {
         indice.push_back(0);
         indice.push_back(num++);
@@ -179,28 +179,28 @@ int main(int argc, char* argv[]) {
 
     // input/sparse_id/index/Placeholder
     auto id_indice_tensor =
-      test::AsTensor<int32>(indice, {static_cast<int32>(indice.size()/2), 2});
+      test::AsTensor<int64>(indice, {static_cast<int64>(indice.size()/2), 2});
     inputs.push_back(std::pair<std::string, Tensor>("input/sparse_" + std::to_string(fieldid) +"/index/Placeholder", id_indice_tensor));
 
     // input/sparse_id/id/Placeholder
-    auto id_list_tensor = test::AsTensor<int32>(fid_list);
+    auto id_list_tensor = test::AsTensor<int64>(fid_list);
     inputs.push_back(std::pair<std::string, Tensor>("input/sparse_" + std::to_string(fieldid) +"/id/Placeholder", id_list_tensor));
 
     // input/sparse_id/shape/Placeholder not used. Why?
-    auto id_tensor_shape = TensorShape({1, static_cast<int32>(fid_list.size())});
+    auto id_tensor_shape = TensorShape({1, static_cast<int64>(fid_list.size())});
 
     // input/sparse_id/value/Placeholder
     auto val_list_tensor = test::AsTensor<float>(fval_list);
     inputs.push_back(std::pair<std::string, Tensor>("input/sparse_" + std::to_string(fieldid) +"/value/Placeholder", val_list_tensor));
   }
   for (int i = 0; i < linear_field.size(); i++) {
-    uint32 fieldid = linear_field[i];
-    std::vector<int32> indice;
-    std::vector<int32> fid_list;
+    uint64 fieldid = linear_field[i];
+    std::vector<int64> indice;
+    std::vector<int64> fid_list;
     std::vector<float> fval_list;
     if (instance.find(fieldid) != instance.end()) {
       int num = 0;
-      for (std::unordered_map<int32, float>::const_iterator iter = instance[fieldid].begin();
+      for (std::unordered_map<int64, float>::const_iterator iter = instance[fieldid].begin();
           iter != instance[fieldid].end(); iter++) {
         indice.push_back(0);
         indice.push_back(num++);
@@ -214,15 +214,15 @@ int main(int argc, char* argv[]) {
 
     // input/linear_id/index/Placeholder
     auto id_indice_tensor =
-      test::AsTensor<int32>(indice, {static_cast<int32>(indice.size()/2), 2});
+      test::AsTensor<int64>(indice, {static_cast<int64>(indice.size()/2), 2});
     inputs.push_back(std::pair<std::string, Tensor>("input/linear_" + std::to_string(fieldid) +"/index/Placeholder", id_indice_tensor));
 
     // input/linear_id/id/Placeholder
-    auto id_list_tensor = test::AsTensor<int32>(fid_list);
+    auto id_list_tensor = test::AsTensor<int64>(fid_list);
     inputs.push_back(std::pair<std::string, Tensor>("input/linear_" + std::to_string(fieldid) +"/id/Placeholder", id_list_tensor));
 
     // input/linear_id/shape/Placeholder not used. Why?
-    auto id_tensor_shape = TensorShape({1, static_cast<int32>(fid_list.size())});
+    auto id_tensor_shape = TensorShape({1, static_cast<int64>(fid_list.size())});
 
     // input/linear_id/value/Placeholder
     auto val_list_tensor = test::AsTensor<float>(fval_list);
