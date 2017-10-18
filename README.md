@@ -61,6 +61,11 @@ sh trans_data_to_tfrecord.sh
 sh train.sh
 ```
 
+## Freeze model
+```bash
+sh freeze_graph.sh
+```
+
 ## Predict using C++
 ```bash
 sh predict.sh
