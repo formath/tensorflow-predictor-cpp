@@ -1,7 +1,7 @@
 # tensorflow-predictor-cpp
 TensorFlow prediction using its C++ API.
 Contains two examples:
-* simple model `c=a+b`
+* simple model `c = a * b`
 * an industrial deep model for large scale click through rate prediction
 
 # Build
