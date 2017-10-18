@@ -25,7 +25,12 @@ make
 ```
 
 # Simple Model
-This demo used `c=a+b` to show how to save the model and load it using C++ for prediction. [tensorflow_c++_api_prediction_basic](http://mathmach.com/2017/10/09/tensorflow_c++_api_prediction_basic/)
+This demo used `c = a * b` to show how to save the model and load it using C++ for prediction.
+* Save model
+* Load model
+* Prediction
+
+More detail in Chinese: [tensorflow_c++_api_prediction_basic](http://mathmach.com/2017/10/09/tensorflow_c++_api_prediction_basic/)
 ```bash
 cd demo/simple_model
 # train
@@ -35,7 +40,14 @@ sh predict.sh
 ```
 
 # Deep CTR Model
-This demo show a real-wrold deep model usage in click through rate prediction. [tensorflow_c++_api_prediction_advance](http://mathmach.com/2017/10/11/tensorflow_c++_api_prediction_advance/)
+This demo show a real-wrold deep model usage in click through rate prediction.
+* Transform LibFM data into TFRecord
+* Save model and checkpoint
+* Replace parts of model and freeze graph with checkpoint
+* Load model and checkpoint
+* Prediction
+
+More detail in Chinese: [tensorflow_c++_api_prediction_advance](http://mathmach.com/2017/10/11/tensorflow_c++_api_prediction_advance/)
 
 ## Transform LibFM data into TFRecord
 * LibFM format: `label fieldId:featureId:value ...`
