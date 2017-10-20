@@ -9,13 +9,13 @@ include_directories(
 	${PROJECT_SOURCE_DIR}/include)
 
 link_directories(
-	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/gen/lib/ios_X86_64
+	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/gen/lib
 	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/gen/protobuf-host/lib
 	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/gen/protobuf_ios/lib/iossim_x86_64/lib
 	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/nsync/builds/x86_64.ios.c++11)
 
 set(DEEP_CTR_LINKER_LIBS "")
-list(APPEND DEEP_CTR_LINKER_LIBS libtensorflow-core-x86_64.a libprotobuf.a libnsync.a pthread m z)
+list(APPEND DEEP_CTR_LINKER_LIBS libtensorflow-core.a libprotobuf.a libnsync.a pthread m z)
 
 # executable
 set(SIMPLE_MODEL "simple_model.bin")
