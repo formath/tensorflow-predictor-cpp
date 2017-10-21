@@ -11,11 +11,10 @@ include_directories(
 link_directories(
 	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/gen/lib
 	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/gen/protobuf-host/lib
-	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/gen/protobuf_ios/lib/iossim_x86_64/lib
-	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/nsync/builds/x86_64.ios.c++11)
+	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/gen/protobuf-host/lib/)
 
 set(DEEP_CTR_LINKER_LIBS "")
-list(APPEND DEEP_CTR_LINKER_LIBS libtensorflow-core.a libprotobuf.a libnsync.a pthread m z)
+list(APPEND DEEP_CTR_LINKER_LIBS libtensorflow-core.a libprotobuf.a pthread m z)
 
 # executable
 set(SIMPLE_MODEL "simple_model.bin")
