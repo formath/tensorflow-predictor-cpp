@@ -11,7 +11,7 @@ Follow the instruction [build tensorflow from source](https://github.com/tensorf
 ```bash
 git clone --recursive https://github.com/tensorflow/tensorflow.git
 cd tensorflow
-sh tensorflow/contrib/makefile/build_all_ios.sh (depends on your platform)
+sh tensorflow/contrib/makefile/build_all_linux.sh (works for linux and osx)
 cd ..
 ```
 
@@ -30,7 +30,7 @@ This demo used `c = a * b` to show how to save the model and load it using C++ f
 * Load model
 * Prediction
 
-More detail in Chinese: [tensorflow_c++_api_prediction_basic](http://mathmach.com/2017/10/09/tensorflow_c++_api_prediction_basic/)
+More detail in Chinese: [tensorflow_c++_api_prediction](http://mathmach.com/2017/10/09/tensorflow_c++_api_prediction_first/)
 ```bash
 cd demo/simple_model
 # train
@@ -47,7 +47,7 @@ This demo show a real-wrold deep model usage in click through rate prediction.
 * Load model and checkpoint
 * Prediction
 
-More detail in Chinese: [tensorflow_c++_api_prediction_advance](http://mathmach.com/2017/10/11/tensorflow_c++_api_prediction_advance/)
+More detail in Chinese: [tensorflow_c++_api_prediction](http://mathmach.com/2017/10/11/tensorflow_c++_api_prediction_second/)
 
 ## Transform LibFM data into TFRecord
 * LibFM format: `label fieldId:featureId:value ...`
