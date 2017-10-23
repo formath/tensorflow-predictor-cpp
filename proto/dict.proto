@@ -1,0 +1,8 @@
+syntax = "proto2";
+package protobuf;
+
+message Dict {
+    map<uint64, uint64> featureid2sortid = 1;
+    map<uint32, uint64> field2missid = 2;
+    map<uint32, uint64> field2feanum = 3;
+}

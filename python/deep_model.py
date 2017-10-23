@@ -5,21 +5,13 @@ import os
 import tensorflow as tf
 
 class Model:
-    def __init__(self, embedding_size, field_feature_dict, sparse_field, continuous_field, linear_field, hidden_layer):
+    def __init__(self, embedding_size, field_feature_dict, sparse_field, hidden_layer):
         self.embedding_size = embedding_size
         self.field_feature_dict = field_feature_dict
         self.sparse_field =[]
         if sparse_field != '':
             for i in sparse_field.split(','):
                 self.sparse_field.append(int(i))
-        self.continuous_field = []
-        if continuous_field != '':
-            for i in continuous_field.split(','):
-                self.continuous_field.append(int(i))
-        self.linear_field = []
-        if linear_field != '':
-            for i in linear_field.split(','):
-                self.linear_field.append(int(i))
         self.hidden_layer = []
         for i in hidden_layer.split(','):
             self.hidden_layer.append(int(i))
@@ -37,7 +29,7 @@ class Model:
 
         return tf.concat(emb, 1, name='concat_embedding')
 
-    def forward(self, sparse_id, sparse_val, linear_id, linear_val, continuous_val):
+    def forward(self, sparse_id, sparse_val):
         '''
         forward graph
         '''
@@ -49,15 +41,11 @@ class Model:
         # sparse field embedding
         net = self.concat(self.sparse_field, sparse_id, sparse_val)
 
-        # concat sparse field embedding and continuous field
-        if len(self.continuous_field) > 0:
-            net = tf.concat([net, continuous_val], 1, name='concat_sparse_continuous')
-
         #hidden layers
         for i, hidden_size in enumerate(self.hidden_layer):
             #dim = net.get_shape().as_list()[1]
             if i == 0:
-                dim = self.embedding_size * len(self.sparse_field) + len(self.continuous_field)
+                dim = self.embedding_size * len(self.sparse_field)
             else:
                 dim = self.hidden_layer[i-1]
             with tf.variable_scope("hidden"):
@@ -66,18 +54,9 @@ class Model:
             self.hiddenW.append(weight)
             self.hiddenB.append(bias)
             net = tf.nn.relu(tf.matmul(net, weight) + bias, name='fully_'+str(i))
-            #net = tf.nn.dropout(net, self.drop_out, name='dropout_'+str(i))
-            #tf.summary.histogram('hidden_w' + str(i), weight)
-
-        # merge linear sparse field embedding
-        if len(self.linear_field) > 0:
-            linear_embedding = self.concat(self.linear_field, linear_id, linear_val)
-            net = tf.concat([net, linear_embedding], 1, name='concat_linear')
 
         #dim = net.get_shape().as_list()[1]
         dim = self.hidden_layer[-1]
-        if len(self.linear_field) > 0:
-            dim += self.embedding_size * len(self.linear_field)
         print("out layer dim:" + str(dim))
         with tf.variable_scope("outlayer"):
             self.weight = tf.Variable(tf.truncated_normal([dim, 1], stddev=0.05), name='weight_out')

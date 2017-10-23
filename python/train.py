@@ -28,9 +28,7 @@ flags.DEFINE_bool("train_from_checkpoint", False, "reload model from checkpoint 
 flags.DEFINE_string('dict', './libfm.dict', 'field feature dict')
 flags.DEFINE_string('train_file', './libfm.tfrecord', 'train file')
 flags.DEFINE_string('valid_file', './libfm.tfrecord', 'valid file')
-flags.DEFINE_string('continuous_fields', '', 'continuous fields. example 0,1,2')
 flags.DEFINE_string('sparse_fields', '', 'sparse fields. example 0,1,2')
-flags.DEFINE_string('linear_fields', '', 'linear sparse fields. example 0,1,2')
 flags.DEFINE_string('hidden_layer', '100,100,50', 'hidden size for eacy layer')
 flags.DEFINE_integer('embedding_size', 10, 'embedding size')
 flags.DEFINE_float('l1', '0.001', 'l1 regularizetion')
@@ -44,27 +42,23 @@ if not os.path.exists(FLAGS.tensorboard_dir):
     os.makedirs(FLAGS.tensorboard_dir)
 
 # data iter
-data = Data(FLAGS.dict, FLAGS.continuous_fields, FLAGS.sparse_fields, FLAGS.linear_fields)
-train_label, train_sparse_id, train_sparse_val, \
-train_linear_id, train_linear_val, train_continuous_val \
-    = data.ReadBatch(FLAGS.train_file,
-                     FLAGS.max_epoch,
-                     FLAGS.batch_size,
-                     FLAGS.thread_num,
-                     FLAGS.min_after_dequeue)
-valid_label, valid_sparse_id, valid_sparse_val, \
-valid_linear_id, valid_linear_val, valid_continuous_val \
-    = data.ReadBatch(FLAGS.valid_file,
-                     FLAGS.max_epoch,
-                     FLAGS.batch_size,
-                     FLAGS.thread_num,
-                     FLAGS.min_after_dequeue)
+data = Data(FLAGS.dict, FLAGS.sparse_fields)
+train_label, train_sparse_id, train_sparse_val = data.ReadBatch(FLAGS.train_file,
+                                                                FLAGS.max_epoch,
+                                                                FLAGS.batch_size,
+                                                                FLAGS.thread_num,
+                                                                FLAGS.min_after_dequeue)
+valid_label, valid_sparse_id, valid_sparse_val = data.ReadBatch(FLAGS.valid_file,
+                                                                FLAGS.max_epoch,
+                                                                FLAGS.batch_size,
+                                                                FLAGS.thread_num,
+                                                                FLAGS.min_after_dequeue)
 
 # define model
-model = Model(FLAGS.embedding_size, data.Dict(), FLAGS.sparse_fields, FLAGS.continuous_fields, FLAGS.linear_fields, FLAGS.hidden_layer)
+model = Model(FLAGS.embedding_size, data.Dict(), FLAGS.sparse_fields, FLAGS.hidden_layer)
 
 # define loss
-logits, all_parameter = model.forward(train_sparse_id, train_sparse_val, train_linear_id, train_linear_val, train_continuous_val)
+logits, all_parameter = model.forward(train_sparse_id, train_sparse_val)
 train_label = tf.to_int64(train_label)
 cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=train_label, name='cross_entropy')
 loss = tf.reduce_mean(cross_entropy, name='loss')
@@ -97,7 +91,7 @@ train_op = optimizer.minimize(cost, global_step=global_step)
 
 # eval acc
 tf.get_variable_scope().reuse_variables()
-valid_logits, _ = model.forward(valid_sparse_id, valid_sparse_val, valid_linear_id, valid_linear_val, valid_continuous_val)
+valid_logits, _ = model.forward(valid_sparse_id, valid_sparse_val)
 valid_softmax = tf.nn.softmax(valid_logits)
 valid_label = tf.to_int64(valid_label)
 correct_prediction = tf.equal(tf.argmax(valid_softmax, 1), valid_label)

@@ -6,9 +6,9 @@ from dict_pb2 import Dict as DictPB
 import tensorflow as tf
 
 class Data:
-    def __init__(self, dict_file, continuous_fields, sparse_fields, linear_fields):
+    def __init__(self, dict_file, sparse_fields):
         self.LoadDict(dict_file)
-        self.ParseFields(continuous_fields, sparse_fields, linear_fields)
+        self.ParseFields(sparse_fields)
 
     # load fieldid and its featureid dict
     def LoadDict(self, dict_file):
@@ -28,22 +28,12 @@ class Data:
 
     # three type of field: continuous, sparse and linear
     # sparse and linear can have the same one fieldid
-    def ParseFields(self, continuous_fields, sparse_fields, linear_fields):
-        if continuous_fields != '':
-            self.continuous_field = [int(x) for x in continuous_fields.split(',')]
-        else:
-            self.continuous_field = []
+    def ParseFields(self, sparse_fields):
         if sparse_fields != '':
             self.sparse_field = [int(x) for x in sparse_fields.split(',')]
         else:
             self.sparse_field = []
-        if linear_fields != '':
-            self.linear_field = [int(x) for x in linear_fields.split(',')]
-        else:
-            self.linear_field = []
-        print('continuous field: ' + continuous_fields)
         print('sparse field: ' + sparse_fields)
-        print('linear field: ' + linear_fields)
 
     # parse each line of libfm data into tfrecord
     def StringToRecord(self, input_file, output_file):
@@ -78,29 +68,6 @@ class Data:
                     feature_val_list.append(0.0)
                 feature['sparse_id_in_field_'+str(fieldid)] = tf.train.Feature(int64_list=tf.train.Int64List(value=feature_id_list))
                 feature['sparse_val_in_field_'+str(fieldid)] = tf.train.Feature(float_list=tf.train.FloatList(value=feature_val_list))
-            for fieldid in self.linear_field:
-                feature_id_list = []
-                feature_val_list = []
-                if fieldid in field2feature:
-                    for featureid in field2feature[fieldid]:
-                        value = field2feature[fieldid][featureid]
-                        feature_id_list.append(self.field_feature_dict.featureid2sortid[featureid])
-                        feature_val_list.append(value)
-                else:
-                    feature_id_list.append(self.field_feature_dict.field2missid[fieldid])
-                    feature_val_list.append(0.0)
-                feature['linear_id_in_field_'+str(fieldid)] = tf.train.Feature(int64_list=tf.train.Int64List(value=feature_id_list))
-                feature['linear_val_in_field_'+str(fieldid)] = tf.train.Feature(float_list=tf.train.FloatList(value=feature_val_list))
-            feature_val_list = []
-            for fieldid in self.continuous_field:
-                if fieldid in field2feature:
-                    assert len(field2feature[fieldid]) == 1
-                    for featureid in field2feature[fieldid]:
-                        value = field2feature[fieldid][featureid]
-                        feature_val_list.append(value)
-                else:
-                    feature_val_list.append(0.0)
-            feature['continuous_val'] = tf.train.Feature(float_list=tf.train.FloatList(value=feature_val_list))
             example = tf.train.Example(features=tf.train.Features(feature=feature))
             writer.write(example.SerializeToString())
 
@@ -132,10 +99,6 @@ class Data:
             for fieldid in self.sparse_field:
                 features['sparse_id_in_field_'+str(fieldid)] = tf.VarLenFeature(tf.int64)
                 features['sparse_val_in_field_'+str(fieldid)] = tf.VarLenFeature(tf.float32)
-            for fieldid in self.linear_field:
-                features['linear_id_in_field_'+str(fieldid)] = tf.VarLenFeature(tf.int64)
-                features['linear_val_in_field_'+str(fieldid)] = tf.VarLenFeature(tf.float32)
-            features['continuous_val'] = tf.FixedLenFeature([], tf.float32)
             instance = tf.parse_example(batch_serialized_example, features)
 
             sparse_id = []
@@ -143,19 +106,15 @@ class Data:
             for fieldid in self.sparse_field:
                 sparse_id.append(instance['sparse_id_in_field_'+str(fieldid)])
                 sparse_val.append(instance['sparse_val_in_field_'+str(fieldid)])
-            linear_id = []
-            linear_val = []
-            for fieldid in self.linear_field:
-                linear_id.append(instance['linear_id_in_field_'+str(fieldid)])
-                linear_val.append(instance['linear_val_in_field_'+str(fieldid)])
-            continuous_val = instance['continuous_val']
-            return instance['label'], sparse_id, sparse_val, linear_id, linear_val, continuous_val
+            return instance['label'], sparse_id, sparse_val
 
     def ReadBatchPlaceholder(self):
         '''
         Return placeholder
         '''
         with tf.name_scope('input'):
+            with tf.variable_scope('label'):
+                self.label = tf.placeholder(tf.float32)
             sparse_id = []
             sparse_val = []
             for fieldid in self.sparse_field:
@@ -170,37 +129,17 @@ class Data:
                         self.sparse_shape = tf.placeholder(tf.int64)
                     sparse_id.append(tf.SparseTensor(self.sparse_index, self.sparse_ids, self.sparse_shape))
                     sparse_val.append(tf.SparseTensor(self.sparse_index, self.sparse_vals, self.sparse_shape))
-            linear_id = []
-            linear_val = []
-            for fieldid in self.linear_field:
-                with tf.variable_scope('linear_'+str(fieldid)):
-                    with tf.variable_scope('index'):
-                        self.linear_index = tf.placeholder(tf.int64)
-                    with tf.variable_scope('id'):
-                        self.linear_ids = tf.placeholder(tf.int64)
-                    with tf.variable_scope('value'):
-                        self.linear_vals = tf.placeholder(tf.float32)
-                    with tf.variable_scope('shape'):
-                        self.linear_shape = tf.placeholder(tf.int64)
-                    linear_id.append(tf.SparseTensor(self.linear_index, self.linear_ids, self.linear_shape))
-                    linear_val.append(tf.SparseTensor(self.linear_index, self.linear_vals, self.linear_shape))
-            with tf.variable_scope('label'):
-                self.label = tf.placeholder(tf.float32)
-            with tf.variable_scope('continuous'):
-                self.continuous_val = tf.placeholder(tf.float32)
-            return self.label, sparse_id, sparse_val, linear_id, linear_val, self.continuous_val
+            return self.label, sparse_id, sparse_val
 
 if __name__ == '__main__':
-    if len(sys.argv) != 7:
+    if len(sys.argv) != 5:
         print('''
             Usage: python data.py dict_file continuous_fields sparse_fields linear_fields input_file output_file
             params: dict_file, field feature dict
-                    continuous_fields, example 0,1,3,4
-                    sparse_fields, example 495, 38, 24
-                    linear_fields, those fields are also sparse, example 37,28,23
+                    sparse_fields, example "495,38,24"
                     input_file, input libfm data
                     output_file, tfrecord file to be generated
             ''')
         exit(1)
-    data = Data(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
-    data.StringToRecord(sys.argv[5], sys.argv[6])
+    data = Data(sys.argv[1], sys.argv[2])
+    data.StringToRecord(sys.argv[3], sys.argv[4])

@@ -6,7 +6,8 @@ include_directories(
 	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/gen/protobuf-host/include
 	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/eigen
 	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/nsync/public
-	${PROJECT_SOURCE_DIR}/include)
+	${PROJECT_SOURCE_DIR}/include
+	${PROJECT_SOURCE_DIR}/proto)
 
 link_directories(
 	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/gen/lib
@@ -28,6 +29,6 @@ target_link_libraries(${SIMPLE_MODEL} ${DEEP_CTR_LINKER_LIBS})
 
 # executable
 set(DEEP_MODEL "deep_model.bin")
-add_executable(${DEEP_MODEL} "deep_model.cc")
+add_executable(${DEEP_MODEL} "deep_model.cc" "../proto/dict.pb.cc")
 set(EXECUTABLE_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/bin")
 target_link_libraries(${DEEP_MODEL} ${DEEP_CTR_LINKER_LIBS})

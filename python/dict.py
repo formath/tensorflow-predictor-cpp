@@ -5,18 +5,14 @@ import os
 from dict_pb2 import Dict as DictPB
 
 class Dict:
-	def __init__(self, continuous_fields, sparse_fields, linear_fields):
-		self.ParseFields(continuous_fields, sparse_fields, linear_fields)
+	def __init__(self, sparse_fields):
+		self.ParseFields(sparse_fields)
 
-	# three type of field: continuous, sparse and linear
-    # sparse and linear can have the same one fieldid
-	def ParseFields(self, continuous_fields, sparse_fields, linear_fields):
-		self.continuous_fields = [int(x) for x in continuous_fields.split(',')]
-		self.sparse_fields = [int(x) for x in sparse_fields.split(',')]
-		self.linear_fields = [int(x) for x in linear_fields.split(',')]
-		print('continuous field: ' + continuous_fields)
+	# type of field: sparse
+	def ParseFields(self, sparse_fields):
+		if sparse_fields != '':
+			self.sparse_fields = [int(x) for x in sparse_fields.split(',')]
 		print('sparse field: ' + sparse_fields)
-		print('linear field: ' + linear_fields)
 
     # generate fieldid and its featureid dict
     # field : {featureid : sortid, featureid : sortid, 'miss' : sortid, 'num': feature_num}
@@ -29,7 +25,7 @@ class Dict:
 			tokens = line.split(' ')
 			for token in tokens[1:]:
 				fieldid, featureid, value = token.split(':')
-				if int(fieldid) not in self.sparse_fields and  int(fieldid) not in self.linear_fields:
+				if int(fieldid) not in self.sparse_fields:
 					continue
 				if int(fieldid) not in field_sortid:
 					field_sortid[int(fieldid)] = 0
@@ -65,15 +61,13 @@ class Dict:
 		print('Successfully generate dict from {} to {}'.format(input_file, output_file))
 
 if __name__ == '__main__':
-	if len(sys.argv) != 6:
+	if len(sys.argv) != 4:
 		print('''
 			Usage: python dict.py continuous_fields sparse_fields linear_fields input_file output_file
-			params: continuous_fields, example 0,1,3,4
-					sparse_fields, example 495, 38, 24
-					linear_fields, those fields are also sparse, example 37,28,23
+			params: sparse_fields, example "495,38,24"
 					input_file, libfm data
 					output_file, dict file to generate
 			''')
 		exit(1)
-	dict = Dict(sys.argv[1], sys.argv[2], sys.argv[3])
-	dict.Parse(sys.argv[4], sys.argv[5])
+	dict = Dict(sys.argv[1])
+	dict.Parse(sys.argv[2], sys.argv[3])
