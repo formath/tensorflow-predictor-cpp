@@ -85,10 +85,4 @@ sh freeze_graph.sh
 sh predict.sh
 ```
 
-# Reference
-* [Various Models implemented in TensorFlow](https://github.com/formath/tensorflow-models)
-* [Loading a TensorFlow graph with the C++ API](https://medium.com/jim-fleming/loading-a-tensorflow-graph-with-the-c-api-4caaff88463f)
-* [Loading a tensorflow graph with the C++ API by using Mnist](http://jackytung8085.blogspot.jp/2016/06/loading-tensorflow-graph-with-c-api-by.html)
-* [Tensorflow Different ways to Export and Run graph in C++](https://stackoverflow.com/questions/35508866/tensorflow-different-ways-to-export-and-run-graph-in-c/43639305#43639305)
-* [Error issues](https://github.com/tensorflow/tensorflow/issues/3308)
 
