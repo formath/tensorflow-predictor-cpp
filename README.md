@@ -6,6 +6,15 @@ Contains two examples:
 * simple model `c = a * b`
 * an industrial deep model for large scale click through rate prediction
 
+Covered knowledge points:
+* save model and checkpoint
+* freeze model with checkpoint
+* replace part of nodes in the model for prediction
+* transform libfm data into tfrecord
+* load model in C++
+* construct `SparseTensor` in C++
+* prediction in C++
+
 # Build
 
 ## Build TensorFlow
