@@ -1,5 +1,5 @@
 # tensorflow-predictor-cpp
-TensorFlow prediction using its C++ API. Have tested on OSX.
+TensorFlow prediction using its C++ API. It Has been tested on OSX.
 
 
 Contains two examples:
