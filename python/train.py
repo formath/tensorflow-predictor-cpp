@@ -100,7 +100,7 @@ train_cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=trai
 train_loss_op = tf.reduce_mean(train_cross_entropy)
 
 # train auc
-train_auc_op = tf.metrics.auc(predictions=train_logits, labels=train_label)
+train_auc, _ = tf.metrics.auc(predictions=train_logits, labels=train_label)
 
 # valid cross entropy loss
 valid_logits, _ = model.forward(valid_sparse_id, valid_sparse_val)
@@ -109,7 +109,7 @@ valid_cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=vali
 valid_loss_op = tf.reduce_mean(valid_cross_entropy)
 
 # valid auc
-valid_auc_op = tf.metrics.auc(predictions=valid_logits, labels=valid_label)
+valid_auc, _ = tf.metrics.auc(predictions=valid_logits, labels=valid_label)
 
 # saver
 checkpoint_file = FLAGS.checkpoint_dir + "/model.checkpoint"
@@ -117,8 +117,7 @@ saver = tf.train.Saver()
 
 # train loop
 with tf.Session() as sess:
-    init_op = tf.initialize_all_variables()
-    sess.run(init_op)
+    sess.run(tf.initialize_all_variables())
     sess.run(tf.initialize_local_variables())
 
     if FLAGS.train_from_checkpoint:
@@ -133,9 +132,9 @@ with tf.Session() as sess:
         while not coord.should_stop():
             _, step = sess.run([train_op, global_step])
             if step % FLAGS.steps_to_validate == 0:
-                train_loss, valid_loss = sess.run([train_loss_op, valid_loss_op])
-                print("Step: {}, train loss: {}, valid loss: {}".format(
-                        step, train_loss, valid_loss))
+                train_loss_val, train_auc_val, valid_loss_val, valid_auc_val = sess.run([train_loss_op, train_auc, valid_loss_op, valid_auc])
+                print("Step: {}, train loss: {}, train auc: {}, valid loss: {}, valid auc: {}".format(
+                        step, train_loss_val, train_auc_val, valid_loss_val, valid_auc_val))
     except tf.errors.OutOfRangeError:
         print("training done")
     finally:
