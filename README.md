@@ -1,5 +1,5 @@
 # tensorflow-predictor-cpp
-TensorFlow prediction using its C++ API.
+TensorFlow prediction using its C++ API. Have tested on OSX.
 Contains two examples:
 * simple model `c = a * b`
 * an industrial deep model for large scale click through rate prediction
