@@ -16,6 +16,7 @@ cd ..
 ```
 
 ## Build this repo
+Keep this repo in the same directory with tensorflow.
 ```bash
 git clone https://github.com/formath/tensorflow-predictor-cpp.git
 cd tensorflow-predictor-cpp
