@@ -85,34 +85,40 @@ elif FLAGS.optimizer == "rmsprop":
 else:
     print("Error: unknown optimizer: {}".format(FLAGS.optimizer))
     exit(1)
+
 with tf.device("/cpu:0"):
     global_step = tf.Variable(0, name='global_step', trainable=False)
 train_op = optimizer.minimize(cost, global_step=global_step)
 
-# eval acc
+# eval
+label_num = 2
 tf.get_variable_scope().reuse_variables()
-valid_logits, _ = model.forward(valid_sparse_id, valid_sparse_val)
-valid_softmax = tf.nn.softmax(valid_logits)
-valid_label = tf.to_int64(valid_label)
-correct_prediction = tf.equal(tf.argmax(valid_softmax, 1), valid_label)
-accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
-# eval auc
-auc = tf.metrics.auc(predictions=valid_logits, labels=valid_label)
+# train cross entropy loss
+train_logits, _ = model.forward(train_sparse_id, train_sparse_val)
+train_label = tf.to_int64(train_label)
+train_cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=train_logits, labels=train_label)
+train_loss_op = tf.reduce_mean(train_cross_entropy)
+
+# train auc
+train_auc_op = tf.metrics.auc(predictions=train_logits, labels=train_label)
+
+# valid cross entropy loss
+valid_logits, _ = model.forward(valid_sparse_id, valid_sparse_val)
+valid_label = tf.to_int64(valid_label)
+valid_cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=valid_logits, labels=valid_label)
+valid_loss_op = tf.reduce_mean(valid_cross_entropy)
+
+# valid auc
+valid_auc_op = tf.metrics.auc(predictions=valid_logits, labels=valid_label)
 
 # saver
 checkpoint_file = FLAGS.checkpoint_dir + "/model.checkpoint"
 saver = tf.train.Saver()
 
-# summary
-#tf.scalar_summary('loss', loss)
-#tf.scalar_summary('accuracy', accuracy)
-#summary_op = tf.merge_all_summaries()
-
 # train loop
 with tf.Session() as sess:
     init_op = tf.initialize_all_variables()
-    #writer = tf.train.SummaryWriter(FLAGS.tensorboard_dir, sess.graph)
     sess.run(init_op)
     sess.run(tf.initialize_local_variables())
 
@@ -126,12 +132,11 @@ with tf.Session() as sess:
     threads = tf.train.start_queue_runners(coord=coord, sess=sess)
     try:
         while not coord.should_stop():
-            _, loss_value, step = sess.run([train_op, loss, global_step])
+            _, step = sess.run([train_op, global_step])
             if step % FLAGS.steps_to_validate == 0:
-                auc_value = sess.run([auc])
-                print("Step: {}, loss: {}, auc: {}".format(
-                        step, loss_value, auc_value))
-                #writer.add_summary(summary_value, step)
+                train_loss, valid_loss = sess.run([train_loss_op, valid_loss_op])
+                print("Step: {}, train loss: {}, valid loss: {}".format(
+                        step, train_loss, valid_loss))
     except tf.errors.OutOfRangeError:
         print("training done")
     finally:
