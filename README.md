@@ -1,6 +1,7 @@
-# tensorflow-predictor-cpp
-TensorFlow prediction using its C++ API.
+tensorflow-predictor-cpp
+========
 
+TensorFlow prediction using its C++ API.
 Having this repo, you will not need `TensorFlow-Serving`. This project has been tested on OSX.
 
 
