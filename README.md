@@ -54,7 +54,7 @@ sh predict.sh
 ```
 
 # Deep CTR Model
-This demo show a real-wrold deep model usage in click through rate prediction.
+This demo show a real-world deep model usage in click through rate prediction.
 * Transform LibFM data into TFRecord
 * Save model and checkpoint
 * Replace parts of model and freeze graph with checkpoint
