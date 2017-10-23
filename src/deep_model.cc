@@ -99,20 +99,9 @@ int main(int argc, char* argv[]) {
   for (std::string feature: features) {
     std::vector<std::string> tokens;
     util::split(feature, ':', tokens);
-    int64 fieldid;
-    int64 featureid;
-    float value;
-    int i = 0;
-    for (std::string token: tokens) {
-      if (i == 0) {
-        fieldid = std::stoi(token);
-      } else if (i == 1) {
-        featureid = std::stoi(token);
-      } else if (i == 2) {
-        value = std::stof(token);
-      }
-      i++;
-    }
+    int64 fieldid = std::stoi(tokens[0]);
+    int64 featureid std::stoi(tokens[1]);
+    float value = std::stof(tokens[2]);
     if (instance.find(fieldid) == instance.end()) {
       std::unordered_map<int64, float> f;
       f[featureid] = value;
