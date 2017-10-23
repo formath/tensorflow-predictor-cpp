@@ -95,12 +95,13 @@ sh predict.sh
 ```
 If works right, you will see this
 ```
-load feature num: 34
+Load feature dict successfully
+sparse feature num: 34
+fieldid: 116 missid: 2
 fieldid: 6 missid: 9
 fieldid: 152 missid: 10
 fieldid: 9 missid: 3
 fieldid: 179 missid: 10
-fieldid: 116 missid: 2
 fieldid: 179 feanum: 11
 fieldid: 116 feanum: 3
 fieldid: 6 feanum: 10

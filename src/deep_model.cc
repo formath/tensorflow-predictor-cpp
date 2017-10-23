@@ -48,7 +48,8 @@ int main(int argc, char* argv[]) {
     std::cerr << "Failed to load dict protobuf" << std::endl;
     return 1;
   }
-  std::cout << "load feature num: " << dict.featureid2sortid_size() << std::endl;
+  std::cout << "Load feature dict successfully" << std::endl;
+  std::cout << "sparse feature num: " << dict.featureid2sortid_size() << std::endl;
   for (::google::protobuf::Map<::google::protobuf::uint32, ::google::protobuf::uint64>::const_iterator iter = dict.field2missid().begin();
     iter != dict.field2missid().end(); iter++) {
     std::cout << "fieldid: " << iter->first << " missid: " << iter->second << std::endl;
