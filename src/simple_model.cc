@@ -3,6 +3,14 @@
 
 using namespace tensorflow;
 
+/**
+ * @brief deep model for click through rate prediction
+ * @details [long description]
+ *
+ * @param argv[1] graph protobuf
+ *
+ * @return [description]
+ */
 int main(int argc, char* argv[]) {
   // Initialize a tensorflow session
   Session* session;
@@ -14,10 +22,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Session created successfully" << std::endl;
   }
 
-  // Read in the protobuf graph we exported
-  // (The path seems to be relative to the cwd. Keep this in mind
-  // when using `bazel run` since the cwd isn't where you call
-  // `bazel run` but from inside a temp folder.)
+  // Load the protobuf graph
   GraphDef graph_def;
   std::string graph_path = argv[1];
   status = ReadBinaryProto(Env::Default(), graph_path, &graph_def);

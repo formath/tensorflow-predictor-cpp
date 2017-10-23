@@ -68,10 +68,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Session created successfully" << std::endl;
   }
 
-  // Read in the protobuf graph we exported
-  // (The path seems to be relative to the cwd. Keep this in mind
-  // when using `bazel run` since the cwd isn't where you call
-  // `bazel run` but from inside a temp folder.)
+  // Load graph protobuf
   GraphDef graph_def;
   std::string graph_path = argv[3];
   status = ReadBinaryProto(Env::Default(), graph_path, &graph_def);
@@ -91,7 +88,7 @@ int main(int argc, char* argv[]) {
   }
 
   // Setup inputs and outputs
-  // input 9:283:1 6:384:1 152:384:1
+  // demo instance: "9:283:1 6:384:1 152:384:1"
   std::string libfm_data = "9:283:1 6:384:1 152:384:1";
   std::unordered_map<int64, std::unordered_map<int64, float> > instance;
   std::vector<std::string> features;
@@ -160,7 +157,7 @@ int main(int argc, char* argv[]) {
   // The session will initialize the outputs
   std::vector<tensorflow::Tensor> outputs;
 
-  // Run the session, evaluating our "logit" operation from the graph
+  // Run the session, evaluating our "predict/add" operation from the graph
   status = session->Run(inputs, {"predict/add"}, {}, &outputs);
   if (!status.ok()) {
     std::cerr << status.ToString() << std::endl;
@@ -169,12 +166,9 @@ int main(int argc, char* argv[]) {
     std::cout << "Run session successfully" << std::endl;
   }
 
-  // Grab the first output (we only evaluated one graph node: "logit")
+  // Grab the first output (we only evaluated one graph node: "predict/add")
   // and convert the node to a scalar representation.
   auto output_softmax = outputs[0].scalar<float>();
-
-  // (There are similar methods for vectors and matrices here:
-  // https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/public/tensor.h)
 
   // Print the results
   std::cout << outputs[0].DebugString() << std::endl;
@@ -182,5 +176,6 @@ int main(int argc, char* argv[]) {
 
   // Free any resources used by the session
   session->Close();
+
   return 0;
 }
