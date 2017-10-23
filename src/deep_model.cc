@@ -100,7 +100,7 @@ int main(int argc, char* argv[]) {
     std::vector<std::string> tokens;
     util::split(feature, ':', tokens);
     int64 fieldid = std::stoi(tokens[0]);
-    int64 featureid std::stoi(tokens[1]);
+    int64 featureid = std::stoi(tokens[1]);
     float value = std::stof(tokens[2]);
     if (instance.find(fieldid) == instance.end()) {
       std::unordered_map<int64, float> f;
@@ -134,6 +134,8 @@ int main(int argc, char* argv[]) {
         }
       }
     } else {
+      indice.push_back(0);
+      indice.push_back(0);
       fid_list.push_back(dict.field2missid().find(fieldid)->second);
       fval_list.push_back(0);
     }
