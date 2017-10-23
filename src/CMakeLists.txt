@@ -14,7 +14,11 @@ link_directories(
 	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/nsync/builds/default.macos.c++11)
 
 set(DEEP_CTR_LINKER_LIBS "")
-list(APPEND DEEP_CTR_LINKER_LIBS libtensorflow-core.a libprotobuf.a libnsync.a pthread m z)
+list(APPEND DEEP_CTR_LINKER_LIBS
+	libtensorflow-core.a
+	libprotobuf.a
+	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/nsync/builds/default.macos.c++11/nsync.a
+	pthread m z)
 
 # executable
 set(SIMPLE_MODEL "simple_model.bin")
