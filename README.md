@@ -52,6 +52,15 @@ sh train.sh
 # predict
 sh predict.sh
 ```
+If works right, you will see this
+```
+Session created successfully
+Load graph protobuf successfully
+Add graph to session successfully
+Run session successfully
+Tensor<type: float shape: [] values: 6>
+output value: 6
+```
 
 # Deep CTR Model
 This demo show a real-world deep model usage in click through rate prediction.
@@ -83,6 +92,26 @@ sh freeze_graph.sh
 ## Predict using C++
 ```bash
 sh predict.sh
+```
+If works right, you will see this
+```
+load feature num: 34
+fieldid: 6 missid: 9
+fieldid: 152 missid: 10
+fieldid: 9 missid: 3
+fieldid: 179 missid: 10
+fieldid: 116 missid: 2
+fieldid: 179 feanum: 11
+fieldid: 116 feanum: 3
+fieldid: 6 feanum: 10
+fieldid: 152 feanum: 11
+fieldid: 9 feanum: 4
+Session created successfully
+Load graph protobuf successfully
+Add graph to session successfully
+Run session successfully
+Tensor<type: float shape: [1,1] values: [0.055317685]>
+output value: 0.0553177
 ```
 
 
