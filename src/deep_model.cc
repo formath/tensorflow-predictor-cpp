@@ -146,9 +146,6 @@ int main(int argc, char* argv[]) {
     auto id_list_tensor = test::AsTensor<int64>(fid_list);
     inputs.push_back(std::pair<std::string, Tensor>("input/sparse_" + std::to_string(fieldid) +"/id/Placeholder", id_list_tensor));
 
-    // input/sparse_id/shape/Placeholder not used. Why?
-    auto id_tensor_shape = TensorShape({1, static_cast<int64>(fid_list.size())});
-
     // input/sparse_id/value/Placeholder
     auto val_list_tensor = test::AsTensor<float>(fval_list);
     inputs.push_back(std::pair<std::string, Tensor>("input/sparse_" + std::to_string(fieldid) +"/value/Placeholder", val_list_tensor));
