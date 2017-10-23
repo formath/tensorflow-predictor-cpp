@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
   Session* session;
   Status status = NewSession(SessionOptions(), &session);
   if (!status.ok()) {
-    std::cout << status.ToString() << std::endl;
+    std::cerr << status.ToString() << std::endl;
     return 1;
   } else {
     std::cout << "Session created successfully" << std::endl;
@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
   std::string graph_path = argv[1];
   status = ReadBinaryProto(Env::Default(), graph_path, &graph_def);
   if (!status.ok()) {
-    std::cout << status.ToString() << std::endl;
+    std::cerr << status.ToString() << std::endl;
     return 1;
   } else {
     std::cout << "Load graph protobuf successfully" << std::endl;
@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
   // Add the graph to the session
   status = session->Create(graph_def);
   if (!status.ok()) {
-    std::cout << status.ToString() << std::endl;
+    std::cerr << status.ToString() << std::endl;
     return 1;
   } else {
     std::cout << "Add graph to session successfully" << std::endl;
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
   // Run the session, evaluating our "c" operation from the graph
   status = session->Run(inputs, {"c"}, {}, &outputs);
   if (!status.ok()) {
-    std::cout << status.ToString() << std::endl;
+    std::cerr << status.ToString() << std::endl;
     return 1;
   } else {
     std::cout << "Run session successfully" << std::endl;
