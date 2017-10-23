@@ -91,7 +91,6 @@ with tf.device("/cpu:0"):
 train_op = optimizer.minimize(cost, global_step=global_step)
 
 # eval
-label_num = 2
 tf.get_variable_scope().reuse_variables()
 
 # train cross entropy loss
