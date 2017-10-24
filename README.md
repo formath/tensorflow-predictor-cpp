@@ -115,6 +115,7 @@ Run session successfully
 Tensor<type: float shape: [1,1] values: [0.055317685]>
 output value: 0.0553177
 ```
+The output value may be different.
 
 # Build on Linux
 The procedure is similar with that of OSX except for you should change those configuration.
