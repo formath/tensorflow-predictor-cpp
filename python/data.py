@@ -84,7 +84,7 @@ class Data:
         Return Tensor and SparseTensor parsed from tfrecord
         '''
         with tf.name_scope('input'):
-            filename_queue = tf.train.string_input_producer(file_name, num_epochs=max_epoch)
+            filename_queue = tf.train.string_input_producer(tf.train.match_filenames_once(file_name), num_epochs=max_epoch)
             serialized_example = self.Decode(filename_queue)
             capacity = thread_num * batch_size + min_after_dequeue
             batch_serialized_example = tf.train.shuffle_batch(
