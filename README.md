@@ -2,7 +2,7 @@ tensorflow-predictor-cpp
 ========
 
 TensorFlow prediction using its C++ API.
-Having this repo, you will not need `TensorFlow-Serving`. This project has been tested on OSX.
+Having this repo, you will not need `TensorFlow-Serving`. This project has been tested on `OSX` and `Linux`.
 
 
 Contains two examples:
@@ -117,7 +117,10 @@ output value: 0.0553177
 ```
 
 # Build on Linux
+The procedure is similar with that of OSX except for you should change those configuration.
 * remove `-undefined dynamic_lookup -all_load` in `CMakeLists.txt`
+* add `-Wl,--allow-multiple-definition -Wl,--whole-archive -Wl,--no-whole-archive` in `CMakeLists.txt`
 * change `default.macos.c++11` to `default.linux.c++11` in `src/CMakeLists.txt`
+* append `dl` to `list(APPEND DEEP_CTR_LINKER_LIBS)` in `src/CMakeLists.txt`
 
 
