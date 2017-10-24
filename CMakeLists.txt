@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(deep-ctr)
+project(tensorflow-predictor-cpp)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -msse4.1 -fPIC -O3 -ggdb -Wall -finline-functions -undefined dynamic_lookup -all_load")
 

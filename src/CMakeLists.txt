@@ -6,6 +6,7 @@ include_directories(
 	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/gen/protobuf-host/include
 	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/eigen
 	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/nsync/public
+	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/googletest/googletest/include
 	${PROJECT_SOURCE_DIR}/include
 	${PROJECT_SOURCE_DIR}/proto)
 

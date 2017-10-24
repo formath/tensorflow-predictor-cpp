@@ -17,7 +17,7 @@ Covered knowledge points:
 * construct `SparseTensor` in C++
 * prediction in C++
 
-# Build
+# Build on OSX
 
 ## Build TensorFlow
 Follow the instruction [build tensorflow from source](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/makefile)
@@ -114,5 +114,9 @@ Run session successfully
 Tensor<type: float shape: [1,1] values: [0.055317685]>
 output value: 0.0553177
 ```
+
+# Build on Linux
+* remove `-undefined dynamic_lookup -all_load` in `CMakeLists.txt`
+* change `default.macos.c++11` to `default.linux.c++11` in `src/CMakeLists.txt`
 
 
