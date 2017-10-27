@@ -20,7 +20,7 @@ Covered knowledge points:
 
 # Build on OSX
 
-## Build TensorFlow
+## 1) Build TensorFlow
 Follow the instruction [build tensorflow from source](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/makefile)
 ```bash
 git clone --recursive https://github.com/tensorflow/tensorflow.git
@@ -29,7 +29,7 @@ sh tensorflow/contrib/makefile/build_all_linux.sh (works for linux and osx)
 cd ..
 ```
 
-## Build this repo
+## 2) Build this repo
 Keep this repo in the same directory with tensorflow.
 ```bash
 git clone https://github.com/formath/tensorflow-predictor-cpp.git
@@ -73,24 +73,24 @@ This demo show a real-world deep model usage in click through rate prediction.
 
 More detail in Chinese: [tensorflow_c++_api_prediction](http://mathmach.com/2017/10/11/tensorflow_c++_api_prediction_second/)
 
-## Transform LibFM data into TFRecord
+## 1) Transform LibFM data into TFRecord
 * LibFM format: `label fieldId:featureId:value ...`
 ```bash
 cd demo/deep_model
 sh trans_data_to_tfrecord.sh
 ```
 
-## Train model
+## 2) Train model
 ```bash
 sh train.sh
 ```
 
-## Freeze model
+## 3) Freeze model
 ```bash
 sh freeze_graph.sh
 ```
 
-## Predict using C++
+## 4) Predict using C++
 ```bash
 sh predict.sh
 ```
