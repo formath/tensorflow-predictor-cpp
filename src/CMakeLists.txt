@@ -12,8 +12,18 @@ include_directories(
 
 link_directories(
 	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/gen/lib
-	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/gen/protobuf-host/lib
-	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/nsync/builds/default.macos.c++11)
+	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/gen/protobuf-host/lib)
+
+if(UNIX AND NOT APPLE)
+    set(LINUX TRUE)
+endif()
+if (LINUX)
+	link_directories(
+		${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/nsync/builds/default.linux.c++11)
+else()
+	link_directories(
+		${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/nsync/builds/default.maxos.c++11)
+endif()
 
 set(DEEP_CTR_LINKER_LIBS "")
 list(APPEND DEEP_CTR_LINKER_LIBS
@@ -21,6 +31,9 @@ list(APPEND DEEP_CTR_LINKER_LIBS
 	libprotobuf.a
 	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/nsync/builds/default.macos.c++11/nsync.a
 	pthread m z)
+if (LINUX)
+	list(APPEND DEEP_CTR_LINKER_LIBS dl)
+endif()
 
 # executable
 set(SIMPLE_MODEL "simple_model.bin")
