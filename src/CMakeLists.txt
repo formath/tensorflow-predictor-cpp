@@ -22,17 +22,21 @@ if (LINUX)
 		${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/nsync/builds/default.linux.c++11)
 else()
 	link_directories(
-		${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/nsync/builds/default.maxos.c++11)
+		${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/nsync/builds/default.macos.c++11)
 endif()
 
 set(DEEP_CTR_LINKER_LIBS "")
 list(APPEND DEEP_CTR_LINKER_LIBS
 	libtensorflow-core.a
 	libprotobuf.a
-	${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/nsync/builds/default.macos.c++11/nsync.a
 	pthread m z)
 if (LINUX)
-	list(APPEND DEEP_CTR_LINKER_LIBS dl)
+	list(APPEND DEEP_CTR_LINKER_LIBS
+		${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/nsync/builds/default.linux.c++11/nsync.a
+		dl)
+else()
+	list(APPEND DEEP_CTR_LINKER_LIBS
+		${PROJECT_SOURCE_DIR}/../tensorflow/tensorflow/contrib/makefile/downloads/nsync/builds/default.macos.c++11/nsync.a)
 endif()
 
 # executable
