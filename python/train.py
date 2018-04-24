@@ -38,8 +38,7 @@ if not os.path.exists(FLAGS.checkpoint_dir):
 if not os.path.exists(FLAGS.tensorboard_dir):
     os.makedirs(FLAGS.tensorboard_dir)
 
-# train loop
-with tf.Graph().as_default():
+with tf.device('/cpu:0'):
     # data iter
     data = Data(FLAGS.sparse_fields)
     train_label, train_sparse_id, train_sparse_val = data.ReadBatch(FLAGS.train_file,
@@ -82,55 +81,52 @@ with tf.Graph().as_default():
         print("Error: unknown optimizer: {}".format(FLAGS.optimizer))
         exit(1)
 
-    with tf.device("/cpu:0"):
-        global_step = tf.Variable(0, name='global_step', trainable=False)
+    global_step = tf.Variable(0, name='global_step', trainable=False)
     train_op = optimizer.minimize(cost, global_step=global_step)
 
-    # eval
+    # to eval
     tf.get_variable_scope().reuse_variables()
 
-    # valid cross entropy loss
-    #valid_logits, _ = model.forward(valid_sparse_id, valid_sparse_val)
-    #valid_label = tf.to_int64(valid_label)
-    #valid_cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=valid_logits, labels=valid_label)
-    #valid_loss_op = tf.reduce_mean(valid_cross_entropy)
-
-    # valid auc
-    #valid_auc, _ = tf.metrics.auc(predictions=valid_logits, labels=valid_label)
+    # valid metric
+    valid_logits, _ = model.forward(valid_sparse_id, valid_sparse_val)
+    valid_label = tf.to_int64(valid_label)
+    valid_cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=valid_logits, labels=valid_label)
+    valid_loss = tf.reduce_mean(valid_cross_entropy)
+    valid_auc, _ = tf.metrics.auc(predictions=valid_logits, labels=valid_label)
 
     # saver
     checkpoint_file = FLAGS.checkpoint_dir + "/model.checkpoint"
     saver = tf.train.Saver()
 
-    with tf.Session() as sess:
-        sess.run(tf.initialize_all_variables())
-        sess.run(tf.initialize_local_variables())
-        sess.run(tf.tables_initializer())
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+    sess.run(tf.local_variables_initializer())
+    sess.run(tf.tables_initializer())
 
-        if FLAGS.train_from_checkpoint:
-            checkpoint_state = tf.train.get_checkpoint_state(FLAGS.checkpoint_dir)
-            if checkpoint_state and checkpoint_state.model_checkpoint_path:
-                print("Continue training from checkpoint {}".format(checkpoint_state.model_checkpoint_path))
-                saver.restore(sess, checkpoint_state.model_checkpoint_path)
+    if FLAGS.train_from_checkpoint:
+        checkpoint_state = tf.train.get_checkpoint_state(FLAGS.checkpoint_dir)
+        if checkpoint_state and checkpoint_state.model_checkpoint_path:
+            print("Continue training from checkpoint {}".format(checkpoint_state.model_checkpoint_path))
+            saver.restore(sess, checkpoint_state.model_checkpoint_path)
 
-        coord = tf.train.Coordinator()
-        threads = tf.train.start_queue_runners(coord=coord, sess=sess)
-        try:
-            while not coord.should_stop():
-                _, step, train_loss_val, train_auc_val = sess.run([train_op, global_step, loss, auc])
-                #if step % FLAGS.steps_to_validate == 0:
-                    #valid_loss_val, valid_auc_val = sess.run([valid_loss_op, valid_auc])
-                    #print("Step: {}, train loss: {}, train auc: {}, valid loss: {}, valid auc: {}".format(
-                    #        step, train_loss_val, train_auc_val, valid_loss_val, valid_auc_val))
-        except tf.errors.OutOfRangeError:
-            print("training done")
-        finally:
-            coord.request_stop()
+    coord = tf.train.Coordinator()
+    threads = tf.train.start_queue_runners(coord=coord, sess=sess)
+    try:
+        while not coord.should_stop():
+            _, step, train_loss_val, train_auc_val = sess.run([train_op, global_step, loss, auc])
+            if step % FLAGS.steps_to_validate == 0:
+                valid_loss_val, valid_auc_val = sess.run([valid_loss, valid_auc])
+                print("Step: {}, train loss: {}, train auc: {}, valid loss: {}, valid auc: {}".format(
+                            step, train_loss_val, train_auc_val, valid_loss_val, valid_auc_val))
+    except tf.errors.OutOfRangeError:
+        print("training done")
+    finally:
+        coord.request_stop()
 
-        saver.save(sess, checkpoint_file)
-        tf.train.write_graph(sess.graph.as_graph_def(), FLAGS.model_dir, 'graph.pb', as_text=False)
-        tf.train.write_graph(sess.graph.as_graph_def(), FLAGS.model_dir, 'graph.txt', as_text=True)
+    saver.save(sess, checkpoint_file)
+    tf.train.write_graph(sess.graph.as_graph_def(), FLAGS.model_dir, 'graph.pb', as_text=False)
+    tf.train.write_graph(sess.graph.as_graph_def(), FLAGS.model_dir, 'graph.txt', as_text=True)
 
-        # wait for threads to exit
-        coord.join(threads)
-        sess.close()
+    # wait for threads to exit
+    coord.join(threads)
+    sess.close()

@@ -22,9 +22,10 @@ class Model:
             mapping_ints = tf.constant([0])
             table = tf.contrib.lookup.index_table_from_tensor(mapping=mapping_ints, num_oov_buckets=100000, dtype=tf.int64)
             sparse_id_in_this_field = table.lookup(sparse_ids[i])
-            embedding_variable = tf.Variable(tf.truncated_normal([100002, self.embedding_size], stddev=0.1))
-            embedding = tf.nn.embedding_lookup_sparse(embedding_variable, sparse_id_in_this_field, sparse_vals[i], "mod", combiner="sum")
-            emb.append(embedding)
+            with tf.variable_scope("emb_"+str(field_id)):
+                embedding_variable = tf.Variable(tf.truncated_normal([100002, self.embedding_size], stddev=0.1))
+                embedding = tf.nn.embedding_lookup_sparse(embedding_variable, sparse_id_in_this_field, sparse_vals[i], "mod", combiner="sum")
+                emb.append(embedding)
             self.embedding.append(embedding_variable)
 
         return tf.concat(emb, 1, name='concat_embedding')
@@ -34,7 +35,7 @@ class Model:
         forward graph
         '''
 
-        with tf.variable_scope("forward", reuse=tf.AUTO_REUSE):
+        with tf.variable_scope("forward"):
             self.embedding = []
             self.hiddenW = []
             self.hiddenB = []
