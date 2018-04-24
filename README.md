@@ -14,6 +14,7 @@ Covered knowledge points:
 * freeze model with checkpoint
 * replace part of nodes in the model for prediction
 * transform libfm data into tfrecord
+* use lookup table for sparse embedding
 * load model in C++
 * construct `SparseTensor` in C++
 * prediction in C++
