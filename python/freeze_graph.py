@@ -59,12 +59,8 @@ def freeze_graph(checkpoint_dir, graph_pb, output_node_names, output_dir):
             print(node.name)
         print('<<< Op List End <<<')
 
-        # We use a built-in TF helper to export variables to constants
-        #output_graph_def = tf.graph_util.convert_variables_to_constants(
-        #    sess, # The session is used to retrieve the weights
-        #    tf.get_default_graph().as_graph_def(), # The graph_def is used to retrieve the nodes
-        #    output_node_names.split(",") # The output node names are used to select the usefull nodes
-        #)
+        # use a built-in TF helper to export variables to constants
+        output_node_names = 'init_all_tables,' + output_node_names
         output_graph_def = tf.graph_util.convert_variables_to_constants(
             sess, # The session is used to retrieve the weights
             graph, # The graph_def is used to retrieve the nodes
@@ -74,7 +70,6 @@ def freeze_graph(checkpoint_dir, graph_pb, output_node_names, output_dir):
         # Finally we serialize and dump the output graph to the filesystem
         tf.train.write_graph(output_graph_def, output_dir, 'freeze_graph.pb', as_text=False)
         tf.train.write_graph(output_graph_def, output_dir, 'freeze_graph.txt', as_text=True)
-
         print("%d ops in the final graph." % len(output_graph_def.node))
 
     return output_graph_def

@@ -18,7 +18,6 @@
 #include "tensorflow/core/platform/logging.h"
 #include "tensorflow/core/platform/test.h"
 #include "tensorflow/core/platform/test_benchmark.h"
-#include "dict.pb.h"
 
 using namespace tensorflow;
 
@@ -27,8 +26,7 @@ using namespace tensorflow;
  * @details [long description]
  *
  * @param argv[1] sparse fieldid list seperated by ','
- * @param argv[2] field featureid dict protobuf
- * @param argv[3] freeze graph protobuf
+ * @param argv[2] freeze graph protobuf
  *
  * @return [description]
  */
@@ -39,24 +37,6 @@ int main(int argc, char* argv[]) {
   util::split(argv[1], ',', tokens);
   for (std::string token: tokens) {
     sparse_field.push_back(std::stoi(token));
-  }
-
-  // load dict protobuf
-  ::protobuf::Dict dict;
-  std::fstream input(argv[2], std::ios::in | std::ios::binary);
-  if (!dict.ParseFromIstream(&input)) {
-    std::cerr << "Failed to load dict protobuf" << std::endl;
-    return 1;
-  }
-  std::cout << "Load feature dict successfully" << std::endl;
-  std::cout << "sparse feature num: " << dict.featureid2sortid_size() << std::endl;
-  for (::google::protobuf::Map<::google::protobuf::uint32, ::google::protobuf::uint64>::const_iterator iter = dict.field2missid().begin();
-    iter != dict.field2missid().end(); iter++) {
-    std::cout << "fieldid: " << iter->first << " missid: " << iter->second << std::endl;
-  }
-  for (::google::protobuf::Map<::google::protobuf::uint32, ::google::protobuf::uint64>::const_iterator iter = dict.field2feanum().begin();
-    iter != dict.field2feanum().end(); iter++) {
-    std::cout << "fieldid: " << iter->first << " feanum: " << iter->second << std::endl;
   }
 
   // Initialize a tensorflow session
@@ -71,7 +51,7 @@ int main(int argc, char* argv[]) {
 
   // Load graph protobuf
   GraphDef graph_def;
-  std::string graph_path = argv[3];
+  std::string graph_path = argv[2];
   status = ReadBinaryProto(Env::Default(), graph_path, &graph_def);
   if (!status.ok()) {
     std::cerr << status.ToString() << std::endl;
@@ -87,6 +67,11 @@ int main(int argc, char* argv[]) {
   } else {
     std::cout << "Add graph to session successfully" << std::endl;
   }
+
+  // Initialize hashTable. This should be executed just once.
+  std::vector<std::pair<std::string, Tensor> > fake_inputs;
+  std::vector<tensorflow::Tensor> fake_outputs;
+  status = session->Run(fake_inputs, {}, {"init_all_tables"}, &fake_outputs);
 
   // Setup inputs and outputs
   // demo instance: "9:283:1 6:384:1 152:384:1"
@@ -123,18 +108,13 @@ int main(int argc, char* argv[]) {
           iter != instance[fieldid].end(); iter++) {
         indice.push_back(0);
         indice.push_back(num++);
-        if (dict.featureid2sortid().find(iter->first) != dict.featureid2sortid().end()) {
-          fid_list.push_back(dict.featureid2sortid().find(iter->first)->second);
-          fval_list.push_back(iter->second);
-        } else {
-          fid_list.push_back(dict.field2missid().find(fieldid)->second);
-          fval_list.push_back(0);
-        }
+        fid_list.push_back(iter->first);
+        fval_list.push_back(iter->second);
       }
     } else {
       indice.push_back(0);
       indice.push_back(0);
-      fid_list.push_back(dict.field2missid().find(fieldid)->second);
+      fid_list.push_back(0);
       fval_list.push_back(0);
     }
 
@@ -156,7 +136,7 @@ int main(int argc, char* argv[]) {
   std::vector<tensorflow::Tensor> outputs;
 
   // Run the session, evaluating our "predict/add" operation from the graph
-  status = session->Run(inputs, {"predict/add"}, {}, &outputs);
+  status = session->Run(inputs, {"forward/logit/add"}, {}, &outputs);
   if (!status.ok()) {
     std::cerr << status.ToString() << std::endl;
     return 1;

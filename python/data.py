@@ -2,32 +2,14 @@
 
 import sys
 import os
-from dict_pb2 import Dict as DictPB
+import ctypes
 import tensorflow as tf
 
 class Data:
-    def __init__(self, dict_file, sparse_fields):
-        self.LoadDict(dict_file)
+    def __init__(self, sparse_fields):
         self.ParseFields(sparse_fields)
 
-    # load fieldid and its featureid dict
-    def LoadDict(self, dict_file):
-        f = open(dict_file, 'rb')
-        dict = DictPB()
-        dict.ParseFromString(f.read())
-        self.field_feature_dict = dict
-        f.close()
-        print('load field num: ' + str(len(self.field_feature_dict.field2missid)))
-        for fieldid, feanum in self.field_feature_dict.field2feanum.items():
-            print('field: ' + str(fieldid) + ' feature num: ' + str(feanum))
-
-
-    def Dict(self):
-        assert self.field_feature_dict is not None
-        return self.field_feature_dict
-
-    # three type of field: continuous, sparse and linear
-    # sparse and linear can have the same one fieldid
+    # sparse field
     def ParseFields(self, sparse_fields):
         if sparse_fields != '':
             self.sparse_field = [int(x) for x in sparse_fields.split(',')]
@@ -61,10 +43,10 @@ class Data:
                 if fieldid in field2feature:
                     for featureid in field2feature[fieldid]:
                         value = field2feature[fieldid][featureid]
-                        feature_id_list.append(self.field_feature_dict.featureid2sortid[featureid])
+                        feature_id_list.append(ctypes.c_longlong(int(featureid)).value)
                         feature_val_list.append(value)
                 else:
-                    feature_id_list.append(self.field_feature_dict.field2missid[fieldid])
+                    feature_id_list.append(0)
                     feature_val_list.append(0.0)
                 feature['sparse_id_in_field_'+str(fieldid)] = tf.train.Feature(int64_list=tf.train.Int64List(value=feature_id_list))
                 feature['sparse_val_in_field_'+str(fieldid)] = tf.train.Feature(float_list=tf.train.FloatList(value=feature_val_list))
@@ -131,14 +113,13 @@ class Data:
             return self.label, sparse_id, sparse_val
 
 if __name__ == '__main__':
-    if len(sys.argv) != 5:
+    if len(sys.argv) != 4:
         print('''
-            Usage: python data.py dict_file continuous_fields sparse_fields linear_fields input_file output_file
-            params: dict_file, field feature dict
-                    sparse_fields, example "495,38,24"
+            Usage: python data.py sparse_fields input_file output_file
+            params: sparse_fields, example "495,38,24"
                     input_file, input libfm data
                     output_file, tfrecord file to be generated
             ''')
         exit(1)
-    data = Data(sys.argv[1], sys.argv[2])
-    data.StringToRecord(sys.argv[3], sys.argv[4])
+    data = Data(sys.argv[1])
+    data.StringToRecord(sys.argv[2], sys.argv[3])

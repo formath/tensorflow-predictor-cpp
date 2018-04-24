@@ -47,6 +47,6 @@ target_link_libraries(${SIMPLE_MODEL} ${DEEP_CTR_LINKER_LIBS})
 
 # executable
 set(DEEP_MODEL "deep_model.bin")
-add_executable(${DEEP_MODEL} "deep_model.cc" "../proto/dict.pb.cc")
+add_executable(${DEEP_MODEL} "deep_model.cc")
 set(EXECUTABLE_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/bin")
 target_link_libraries(${DEEP_MODEL} ${DEEP_CTR_LINKER_LIBS})
