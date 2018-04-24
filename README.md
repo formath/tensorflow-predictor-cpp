@@ -112,8 +112,8 @@ Session created successfully
 Load graph protobuf successfully
 Add graph to session successfully
 Run session successfully
-Tensor<type: float shape: [1,1] values: [0.055317685]>
-output value: 0.0553177
+Tensor<type: float shape: [1,2] values: [0.85252136 0.14747864]>
+output value: 0.147479
 ```
 The output value may be different.
 
