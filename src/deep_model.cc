@@ -72,6 +72,12 @@ int main(int argc, char* argv[]) {
   std::vector<std::pair<std::string, Tensor> > fake_inputs;
   std::vector<tensorflow::Tensor> fake_outputs;
   status = session->Run(fake_inputs, {}, {"init_all_tables"}, &fake_outputs);
+  if (!status.ok()) {
+    std::cerr << status.ToString() << std::endl;
+    return 1;
+  } else {
+    std::cout << "Init lookup table successfully" << std::endl;
+  }
 
   // Setup inputs and outputs
   // demo instance: "9:283:1 6:384:1 152:384:1"

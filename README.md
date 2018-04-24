@@ -97,21 +97,10 @@ sh predict.sh
 ```
 If works right, you will see this
 ```
-Load feature dict successfully
-sparse feature num: 34
-fieldid: 116 missid: 2
-fieldid: 6 missid: 9
-fieldid: 152 missid: 10
-fieldid: 9 missid: 3
-fieldid: 179 missid: 10
-fieldid: 179 feanum: 11
-fieldid: 116 feanum: 3
-fieldid: 6 feanum: 10
-fieldid: 152 feanum: 11
-fieldid: 9 feanum: 4
 Session created successfully
 Load graph protobuf successfully
 Add graph to session successfully
+Init lookup table successfully
 Run session successfully
 Tensor<type: float shape: [1,2] values: [0.85252136 0.14747864]>
 output value: 0.147479
