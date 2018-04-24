@@ -66,6 +66,7 @@ output value: 6
 # Deep CTR Model
 This demo show a real-world deep model usage in click through rate prediction.
 * Transform LibFM data into TFRecord
+* Usage of lookup table
 * Save model and checkpoint
 * Replace parts of model and freeze graph with checkpoint
 * Load model and checkpoint
