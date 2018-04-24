@@ -60,8 +60,6 @@ with tf.device('/cpu:0'):
     train_label = tf.to_int64(train_label)
     cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=train_label, name='cross_entropy')
     loss = tf.reduce_mean(cross_entropy, name='loss')
-    auc, _ = tf.metrics.auc(predictions=logits, labels=train_label)
-    cost = tf.reduce_mean(loss, name='cost')
 
     # define optimizer
     print("Optimization algorithm: {}".format(FLAGS.optimizer))
@@ -82,7 +80,7 @@ with tf.device('/cpu:0'):
         exit(1)
 
     global_step = tf.Variable(0, name='global_step', trainable=False)
-    train_op = optimizer.minimize(cost, global_step=global_step)
+    train_op = optimizer.minimize(loss, global_step=global_step)
 
     # to eval
     tf.get_variable_scope().reuse_variables()
@@ -92,7 +90,6 @@ with tf.device('/cpu:0'):
     valid_label = tf.to_int64(valid_label)
     valid_cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=valid_logits, labels=valid_label)
     valid_loss = tf.reduce_mean(valid_cross_entropy)
-    valid_auc, _ = tf.metrics.auc(predictions=valid_logits, labels=valid_label)
 
     # saver
     checkpoint_file = FLAGS.checkpoint_dir + "/model.checkpoint"
@@ -113,11 +110,11 @@ with tf.Session() as sess:
     threads = tf.train.start_queue_runners(coord=coord, sess=sess)
     try:
         while not coord.should_stop():
-            _, step, train_loss_val, train_auc_val = sess.run([train_op, global_step, loss, auc])
+            _, step, train_loss_val = sess.run([train_op, global_step, loss])
             if step % FLAGS.steps_to_validate == 0:
-                valid_loss_val, valid_auc_val = sess.run([valid_loss, valid_auc])
-                print("Step: {}, train loss: {}, train auc: {}, valid loss: {}, valid auc: {}".format(
-                            step, train_loss_val, train_auc_val, valid_loss_val, valid_auc_val))
+                valid_loss_val = sess.run([valid_loss])
+                print("Step: {}, train loss: {}, valid loss: {}".format(
+                            step, train_loss_val, valid_loss_val))
     except tf.errors.OutOfRangeError:
         print("training done")
     finally:

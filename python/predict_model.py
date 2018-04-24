@@ -28,8 +28,7 @@ model = Model(FLAGS.embedding_size, FLAGS.sparse_fields, FLAGS.hidden_layer)
 
 # define loss
 logits, all_parameter = model.forward(sparse_id, sparse_val)
-train_label = tf.to_int64(label)
-cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=train_label, name='cross_entropy')
+softmax = tf.nn.softmax(logits, name='pctr')
 
 # save graph
 with tf.Session() as sess:

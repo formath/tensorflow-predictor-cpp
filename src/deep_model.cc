@@ -136,7 +136,7 @@ int main(int argc, char* argv[]) {
   std::vector<tensorflow::Tensor> outputs;
 
   // Run the session, evaluating our "predict/add" operation from the graph
-  status = session->Run(inputs, {"forward/logit/add"}, {}, &outputs);
+  status = session->Run(inputs, {"pctr"}, {}, &outputs);
   if (!status.ok()) {
     std::cerr << status.ToString() << std::endl;
     return 1;
@@ -144,13 +144,13 @@ int main(int argc, char* argv[]) {
     std::cout << "Run session successfully" << std::endl;
   }
 
-  // Grab the first output (we only evaluated one graph node: "predict/add")
+  // Grab the first output (we only evaluated one graph node: "pctr")
   // and convert the node to a scalar representation.
-  auto output_softmax = outputs[0].scalar<float>();
+  auto pctr = outputs[0].tensor<float, 2>()(0, 1);
 
   // Print the results
   std::cout << outputs[0].DebugString() << std::endl;
-  std::cout << "output value: " << output_softmax() << std::endl;
+  std::cout << "output value: " << pctr << std::endl;
 
   // Free any resources used by the session
   session->Close();

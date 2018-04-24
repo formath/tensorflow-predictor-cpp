@@ -58,8 +58,8 @@ class Model:
 
             #dim = net.get_shape().as_list()[1]
             dim = self.hidden_layer[-1]
-            self.weight = tf.Variable(tf.truncated_normal([dim, 1], stddev=0.1), name='weight_out')
-            self.bias = tf.Variable(tf.truncated_normal([1], stddev=0.1), name='bias_out')
+            self.weight = tf.Variable(tf.truncated_normal([dim, 2], stddev=0.1), name='weight_out')
+            self.bias = tf.Variable(tf.truncated_normal([2], stddev=0.1), name='bias_out')
             with tf.variable_scope("logit"):
                 logits = tf.matmul(net, self.weight) + self.bias
 

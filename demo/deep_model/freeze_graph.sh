@@ -23,5 +23,5 @@
 python ../../python/freeze_graph.py \
     --checkpoint_dir='./checkpoint' \
     --graph_pb='./model/predict_graph.pb' \
-    --output_node_names='forward/logit/add' \
+    --output_node_names='pctr' \
     --output_dir='./model'
