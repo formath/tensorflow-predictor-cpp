@@ -23,8 +23,8 @@ class Model:
             table = tf.contrib.lookup.index_table_from_tensor(mapping=mapping_ints, num_oov_buckets=100000, dtype=tf.int64)
             sparse_id_in_this_field = table.lookup(sparse_ids[i])
             with tf.variable_scope("emb_"+str(field_id)):
-                embedding_variable = tf.Variable(tf.truncated_normal([100002, self.embedding_size], stddev=0.1))
-                embedding = tf.nn.embedding_lookup_sparse(embedding_variable, sparse_id_in_this_field, sparse_vals[i], "mod", combiner="sum")
+                embedding_variable = tf.get_variable(name="emb_"+str(field_id), initializer=tf.truncated_normal([100002, self.embedding_size], stddev=0.1))
+                embedding = tf.nn.embedding_lookup_sparse(embedding_variable, sparse_id_in_this_field, sparse_vals[i], combiner="sum")
                 emb.append(embedding)
             self.embedding.append(embedding_variable)
 
@@ -50,16 +50,16 @@ class Model:
                     dim = self.embedding_size * len(self.sparse_field)
                 else:
                     dim = self.hidden_layer[i-1]
-                weight = tf.Variable(tf.truncated_normal([dim, hidden_size], stddev=0.1), name='fully_weight_'+str(i))
-                bias = tf.Variable(tf.truncated_normal([hidden_size], stddev=0.1), name='fully_bias_'+str(i))
+                weight = tf.get_variable(initializer=tf.truncated_normal([dim, hidden_size], stddev=0.1), name='fully_weight_'+str(i))              
+                bias = tf.get_variable(initializer=tf.truncated_normal([hidden_size], stddev=0.1), name='fully_bias_'+str(i))
                 self.hiddenW.append(weight)
                 self.hiddenB.append(bias)
                 net = tf.nn.relu(tf.matmul(net, weight) + bias, name='fully_'+str(i))
 
             #dim = net.get_shape().as_list()[1]
             dim = self.hidden_layer[-1]
-            self.weight = tf.Variable(tf.truncated_normal([dim, 2], stddev=0.1), name='weight_out')
-            self.bias = tf.Variable(tf.truncated_normal([2], stddev=0.1), name='bias_out')
+            self.weight = tf.get_variable(initializer=tf.truncated_normal([dim, 2], stddev=0.1), name='weight_out')
+            self.bias = tf.get_variable(initializer=tf.truncated_normal([2], stddev=0.1), name='bias_out')
             with tf.variable_scope("logit"):
                 logits = tf.matmul(net, self.weight) + self.bias
 
